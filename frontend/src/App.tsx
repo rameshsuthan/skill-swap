@@ -255,7 +255,7 @@ export default function App() {
               {name === "skillswap"
                 ? "SkillSwap MCP"
                 : name === "gemini"
-                  ? "Gemini 3.8 Flash"
+                  ? providers.gemini?.model || "Gemini"
                   : name === "mem0"
                     ? "Mem0"
                     : "Pinecone"}

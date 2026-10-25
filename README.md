@@ -2,7 +2,7 @@
 
 Turn what you know into what you want to learn. A local React workspace uses three Gemini specialists in LangGraph and a real custom MCP server to propose reciprocal learning exchanges across a global cohort.
 
-**Current status:** local domain, MCP, workflow, API and browser acceptance checks pass. Live `gemini-3.8-flash` metadata is accessible, but generation returned HTTP 503 (high demand) and HTTP 504 (deadline exceeded) during setup. A complete live model workflow is **not yet verified**. No model was substituted. Mem0 and Pinecone remain disabled pending that check.
+**Current status:** the local prototype and a complete live `gemini-3.5-flash-lite` workflow are verified. The user authorized this model after `gemini-3.8-flash` returned HTTP 503/504. Structured output, a real Gemini-requested MCP round trip, all three specialists, approval/save, and restart recovery passed. Mem0 and Pinecone remain optional and disabled.
 
 Approval saves an **unconfirmed proposal**. It does not book sessions, reserve availability, or contact anyone. All 15 profiles are fictional. Dates are October 26–30, 2026.
 
@@ -27,7 +27,7 @@ npm --prefix frontend ci
 cp .env.example .env
 ```
 
-Set the API key privately. Keep `GEMINI_MODEL=gemini-3.8-flash`. This uses the Gemini Developer API with `vertexai=False`. No alternate-model fallback or billing changes occur. The generation API cannot prove the account's billing tier or remaining quota; inspect the project's tier and limits in Google AI Studio. [Google's model pricing](https://ai.google.dev/gemini-api/docs/pricing) lists free-tier access for the configured model.
+Set the API key privately. The active setting is `GEMINI_MODEL=gemini-3.5-flash-lite`. Both explicitly authorized model IDs remain allowed; the app never switches automatically. This uses the Gemini Developer API with `vertexai=False`. No billing changes occur. The generation API cannot prove the account's billing tier or remaining quota; inspect the project's tier and limits in Google AI Studio. [Google's model pricing](https://ai.google.dev/gemini-api/docs/pricing) lists free-tier access for the configured model.
 
 ```bash
 .venv/bin/python scripts/preflight.py --core

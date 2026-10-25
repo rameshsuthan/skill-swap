@@ -1,6 +1,6 @@
 # SkillSwap architecture and diagrams
 
-Architecture prepared October 24, 2026. The October 25 local implementation follows this topology; [validation](../validation-results.md) separates real MCP/local checks from the still-blocked live Gemini check. The [design spec](../superpowers/specs/2026-10-24-skillswap-design.md) is authoritative. These diagrams describe the proposed build; they do not establish working integrations. The core is a single-operator demo with fictional profiles. Optional vendor connections require separate authenticated smoke tests.
+Architecture prepared October 24, 2026. The October 25 local implementation follows this topology; [validation](../validation-results.md) records local checks and the successful live `gemini-3.5-flash-lite` workflow authorized October 25. Model labels below preserve the original design; the configured default is now `gemini-3.5-flash-lite`. The [design spec](../superpowers/specs/2026-10-24-skillswap-design.md) is authoritative. These diagrams describe the proposed build; they do not establish working integrations. The core is a single-operator demo with fictional profiles. Optional vendor connections require separate authenticated smoke tests.
 
 ## System architecture
 

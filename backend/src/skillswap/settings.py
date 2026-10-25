@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     google_api_key: SecretStr = Field(
         default=SecretStr(""), validation_alias=AliasChoices("GOOGLE_API_KEY", "GEMINI_API_KEY")
     )
-    gemini_model: str = "gemini-3.8-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
     domain_db: Path = Field(
         default=ROOT / "storage/skillswap.sqlite", validation_alias="SKILLSWAP_DOMAIN_DB"
     )

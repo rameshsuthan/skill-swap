@@ -1,6 +1,6 @@
 # SkillSwap planning package
 
-Prepared October 24, 2026. Implementation update October 25: the local prototype is built and verified with real MCP and controlled-model acceptance tests. Live Gemini generation remains blocked by HTTP 503/504. See the [startup guide](../../README.md) and [validation report](../validation-results.md); the linked design/plan preserve the original planning package.
+Prepared October 24, 2026. Implementation update October 25: the local prototype is verified with real MCP, automated acceptance tests, and a live three-specialist workflow using user-authorized `gemini-3.5-flash-lite`. The original `gemini-3.8-flash` checks returned HTTP 503/504. See the [startup guide](../../README.md) and [validation report](../validation-results.md); the linked design/plan preserve the original planning package.
 
 SkillSwap helps a worldwide remote learning community discover reciprocal teaching opportunities, including three-person exchanges when a direct swap is unavailable.
 

@@ -4,10 +4,10 @@ import asyncio
 import json
 import logging
 
-from dotenv import dotenv_values
 from langchain_core.messages import HumanMessage, ToolMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
+from skillswap.model_factory import make_model
+from skillswap.settings import Settings
 
 logging.disable(logging.CRITICAL)
 
@@ -17,17 +17,17 @@ class Probe(BaseModel):
 
 
 async def main():
-    env = dotenv_values(".env")
-    key = env.get("GOOGLE_API_KEY") or env.get("GEMINI_API_KEY")
-    print(json.dumps({"key_configured": bool(key), "model": "gemini-3.8-flash"}), flush=True)
-    model = ChatGoogleGenerativeAI(
-        model="gemini-3.8-flash",
-        api_key=key,
-        vertexai=False,
-        temperature=0,
-        max_retries=0,
-        timeout=25,
+    settings = Settings()
+    print(
+        json.dumps(
+            {
+                "key_configured": bool(settings.google_api_key.get_secret_value()),
+                "model": settings.gemini_model,
+            }
+        ),
+        flush=True,
     )
+    model = make_model(settings)
     try:
         answer = await model.with_structured_output(Probe).ainvoke("Return ok true.")
         print(json.dumps({"structured_response": answer.ok}), flush=True)

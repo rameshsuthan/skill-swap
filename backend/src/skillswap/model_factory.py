@@ -2,7 +2,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 def make_model(settings):
-    if settings.gemini_model != "gemini-3.8-flash":
+    if settings.gemini_model not in {"gemini-3.8-flash", "gemini-3.5-flash-lite"}:
         raise ValueError("model_substitution_disabled")
     if not settings.google_api_key.get_secret_value():
         raise ValueError("google_api_key_required")
@@ -10,7 +10,7 @@ def make_model(settings):
         model=settings.gemini_model,
         api_key=settings.google_api_key.get_secret_value(),
         vertexai=False,
-        temperature=0,
+        temperature=None if settings.gemini_model == "gemini-3.5-flash-lite" else 0,
         max_retries=0,
         timeout=25,
     )
