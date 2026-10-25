@@ -20,7 +20,7 @@ def error_code(exc):
     text = str(exc).lower()
     if "429" in text or "resource_exhausted" in text:
         return "quota_limited"
-    if "503" in text or "unavailable" in text:
+    if "503" in text or "504" in text or "unavailable" in text or "deadline_exceeded" in text:
         return "provider_unavailable"
     if "401" in text or "403" in text:
         return "provider_access_denied"

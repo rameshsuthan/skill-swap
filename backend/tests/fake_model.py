@@ -10,6 +10,7 @@ class ControlledModel:
         self.quota = quota
         self.reject_once = reject_once
         self.ambiguous = ambiguous
+        self.reviewer_outage = False
         self.tools = []
         self.schema = None
 
@@ -29,6 +30,10 @@ class ControlledModel:
         if "simulate quota" in payload.get("request", "").lower():
             raise RuntimeError("429 RESOURCE_EXHAUSTED")
         role = payload["role"]
+        if role == "interpreter":
+            self.reviewer_outage = "simulate reviewer outage" in payload.get("request", "").lower()
+        if role == "reviewer" and self.reviewer_outage:
+            raise RuntimeError("503 UNAVAILABLE")
         results = [json.loads(m.content) for m in messages if m.type == "tool"]
         if self.schema:
             if role == "interpreter":

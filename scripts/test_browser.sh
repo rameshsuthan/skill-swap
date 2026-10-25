@@ -9,7 +9,7 @@ if curl -fsS http://127.0.0.1:8000/api/providers >/dev/null 2>&1 || curl -fsS ht
   echo 'Ports 8000/5173 must be free; stop existing dev servers first.'
   exit 1
 fi
-.venv/bin/python -m uvicorn browser_server:app --app-dir backend/tests --host 127.0.0.1 --port 8000 &
+.venv/bin/python -m uvicorn browser_server:app --app-dir backend/tests --host 127.0.0.1 --port 8000 --no-access-log &
 backend_pid=$!
 npm --prefix frontend run dev &
 frontend_pid=$!

@@ -8,7 +8,12 @@ import {
 } from "lucide-react";
 import type { Run, Profile } from "../types";
 import { skill } from "./LearnerPanel";
-import { localInterval, wall, dayBadge } from "../time";
+import {
+  localInterval,
+  offsetRange,
+  crossesClockChange,
+  dayBadge,
+} from "../time";
 import { downloadProposal } from "../api";
 export default function ProposalPanel({
   run,
@@ -28,6 +33,8 @@ export default function ProposalPanel({
   pending: boolean;
 }) {
   const plan = run?.plan;
+  const reviewed =
+    !!run && ["awaiting_approval", "saved", "save_error"].includes(run.status);
   const name = (id: string) =>
     profiles.find((p) => p.id === id)?.display_name || id;
   return (
@@ -79,20 +86,31 @@ export default function ProposalPanel({
         <>
           <div
             className={
-              "review-banner " + (run?.status === "saved" ? "saved" : "")
+              "review-banner " +
+              (!reviewed
+                ? "pending-review"
+                : run?.status === "saved"
+                  ? "saved"
+                  : "")
             }
           >
-            <ShieldCheck size={18} />
+            {reviewed ? <ShieldCheck size={18} /> : <Clock3 size={18} />}
             <div>
               <strong>
                 {run?.status === "saved"
                   ? "Awaiting participant confirmation"
-                  : "Checked & ready for your review"}
+                  : !reviewed
+                    ? "Awaiting independent review"
+                    : run?.status === "save_error"
+                      ? "Review complete · save needs recovery"
+                      : "Checked & ready for your review"}
               </strong>
               <span>
                 {run?.status === "saved"
                   ? "Saved safely. Nobody has been booked or contacted."
-                  : `${plan.sessions.length} sessions · ${plan.sessions.length * 30} minutes of shared learning`}
+                  : !reviewed
+                    ? "This is a candidate only. It cannot be approved until review completes."
+                    : `${plan.sessions.length} sessions · ${plan.sessions.length * 30} minutes of shared learning`}
               </span>
             </div>
           </div>
@@ -141,8 +159,13 @@ export default function ProposalPanel({
                       </div>
                       <strong>{localInterval(v)}</strong>
                       <small>
-                        {v.timezone} · {wall(v.start_local).offset}
+                        {v.timezone} · {offsetRange(v)}
                       </small>
+                      {crossesClockChange(v) && (
+                        <small className="clock-change">
+                          Clock change during this session
+                        </small>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -121,3 +121,58 @@ test("quota_failure_is_visible_and_never_fabricates_a_plan", async ({
     fullPage: true,
   });
 });
+
+test("reviewer_failure_does_not_claim_a_reviewed_proposal", async ({
+  page,
+}) => {
+  await page
+    .getByLabel("What would you like to learn?")
+    .fill("Presentation design, simulate reviewer outage");
+  await page
+    .getByRole("button", { name: "Find my exchange", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("Gemini");
+  await expect(
+    page.getByText("Awaiting independent review", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Checked & ready for your review", { exact: true }),
+  ).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Approve & save proposal" }),
+  ).toBeDisabled();
+});
+
+test("clock_change_displays_both_endpoint_offsets", async ({ page }) => {
+  const fixture = `
+from skillswap.settings import Settings
+from skillswap.repository import Repository
+from skillswap.scheduling import normalize_window
+from skillswap.models import LocalAvailabilityInput
+r=Repository(Settings().domain_db)
+def window(a,b,z,**folds):
+ return normalize_window(LocalAvailabilityInput(start_local=a,end_local=b,timezone=z,**folds)).model_dump()
+r.update_profile('amelia',timezone='America/Chicago',city='Chicago',country_code='US',availability=[window('2026-11-01T01:45','2026-11-01T01:45','America/Chicago',start_fold=0,end_fold=1)])
+r.update_profile('bruno',availability=[window('2026-11-01T03:45','2026-11-01T04:45','America/Sao_Paulo')])
+`;
+  execFileSync(root + "/.venv/bin/python", ["-c", fixture], {
+    cwd: root,
+    env: {
+      ...process.env,
+      SKILLSWAP_DOMAIN_DB: root + "/storage/browser-domain.sqlite",
+    },
+  });
+  await page.reload();
+  await page.getByLabel("Learner").selectOption("amelia");
+  await page
+    .getByLabel("What would you like to learn?")
+    .fill("Excel automation");
+  await propose(page);
+  await expect(
+    page.getByText("America/Chicago · UTC−05:00 → UTC−06:00", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Clock change during this session", { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({path:"test-results/clock-change.png",fullPage:true});
+});

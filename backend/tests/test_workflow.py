@@ -202,3 +202,43 @@ async def test_uncertain_save_can_be_recovered_without_new_proposal(service):
     assert (await wait(service, rid))["status"] == "saved"
     with Repository(service.settings.domain_db).connection() as db:
         assert db.execute("SELECT COUNT(*) FROM proposals").fetchone()[0] == 1
+
+
+async def test_provider_deadline_failure_is_visible(service):
+    async def deadline(messages):
+        raise RuntimeError("504 DEADLINE_EXCEEDED")
+
+    service.agents.model.ainvoke = deadline
+    rid = await service.start("maya", "Presentation design")
+    result = await wait(service, rid)
+    assert result["status"] == "provider_unavailable"
+    assert result["plan"] is None
+
+
+async def test_saved_proposal_recovery_survives_exhausted_active_budget(service):
+    rid = await service.start("maya", "Presentation design")
+    before = await wait(service, rid)
+    original = service.router.call
+    saved = asyncio.Event()
+
+    async def slow_response(server, tool, arguments, ctx, role="host"):
+        result = await original(server, tool, arguments, ctx, role)
+        if tool == "save_proposal":
+            saved.set()
+            await asyncio.sleep(1)
+        return result
+
+    service.router.call = slow_response
+    service.update(rid, active_seconds=89.5)
+    await service.resume(rid, {"decision": "approve", "fingerprint": before["plan"]["fingerprint"]})
+    await asyncio.wait_for(saved.wait(), 2)
+    state = await wait(service, rid)
+    assert state["status"] == "save_error"
+    assert state["active_seconds"] >= 90
+    service.router.call = original
+    await service.resume(rid, {"decision": "retry"})
+    recovered = await wait(service, rid)
+    assert recovered["status"] == "saved"
+    assert recovered["result"]["plan"]["fingerprint"] == before["plan"]["fingerprint"]
+    with Repository(service.settings.domain_db).connection() as db:
+        assert db.execute("SELECT COUNT(*) FROM proposals").fetchone()[0] == 1

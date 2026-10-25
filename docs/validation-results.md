@@ -18,7 +18,7 @@ Checked October 25, 2026 (America/Chicago). This report distinguishes determinis
 | Browser | Save/export/reload; stale-plan second approval; participant times with Honolulu browser timezone | Passed against real local backend, controlled model |
 | Visual QA | Desktop 1280px and mobile 390px full-page screenshots | Inspected; no horizontal clipping |
 | Gemini metadata | Authenticated exact `models/gemini-3.8-flash` metadata | Accessible; generateContent supported |
-| Gemini generation | LangChain structured output and plain generation | **Blocked: HTTP 503 UNAVAILABLE, high demand** |
+| Gemini generation | LangChain structured output and plain generation | **Blocked: HTTP 503 UNAVAILABLE (high demand); full workflow smoke returned HTTP 504 DEADLINE_EXCEEDED** |
 | Live Gemini ↔ MCP and three-role workflow | `preflight.py --core`, `smoke_core.py --live-model` | **Not verified while generation is unavailable** |
 | Account free tier / quota | Google publishes free-tier availability; generation API does not expose account tier/remaining quota | Account-level verification remains open |
 | Mem0 / Pinecone | No integration enabled or live success claimed | Deferred until live core passes |
@@ -29,4 +29,8 @@ The implementation uses at most 16 model invocations per run (including retries)
 
 No live integration success is inferred from dependency installation, documentation, mock behavior, or a provider badge. API credentials and raw provider exceptions are absent from tracked files and application activity records.
 
-Latest full local check: **43 backend tests passed**, focused Ruff checks passed, TypeScript/Vite production build passed, and **4 Playwright cases passed in 5.7 seconds**, including a visible quota-error state with no fabricated proposal. The fresh-process test is separate from in-process service reopen coverage. Screenshot artifacts remain in ignored `frontend/test-results/`.
+Latest full local check: **45 backend tests passed**, focused Ruff checks passed, TypeScript/Vite production build passed, and **6 Playwright cases passed in 7.0 seconds**, including a visible quota-error state with no fabricated proposal. The fresh-process test is separate from in-process service reopen coverage. Screenshot artifacts remain in ignored `frontend/test-results/`.
+
+Final independent review found three local issues, each reproduced before its fix: recovery after budget expiration, ending offsets across a repeated DST hour, and a ready banner after reviewer failure. Regression tests now cover all three. Approved-save recovery has a separate **30-second host-only window**; it cannot extend the 90-second model-investigation budget. A Chicago `01:45−05:00 → 01:15−06:00` session shows both endpoint offsets and a clock-change label. Failed review leaves a visibly unreviewed candidate with approval disabled.
+
+Latest live full-workflow attempt: `smoke_core.py --live-model`, run `17dca705-5838-4397-8c59-76fe17a8cf31`, one model call, 24.07 active seconds, Google HTTP 504 `DEADLINE_EXCEEDED`. No plan or proposal was produced. This joins earlier HTTP 503 generation failures. Error classification now identifies both as provider unavailability.

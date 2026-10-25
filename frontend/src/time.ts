@@ -43,3 +43,12 @@ export function viewerTime(utc: string, timezone: string) {
     timeZone: timezone,
   }).format(new Date(utc));
 }
+
+export function offsetRange(view: LocalView) {
+  const start = wall(view.start_local).offset;
+  const end = wall(view.end_local).offset;
+  return start === end ? start : `${start} → ${end}`;
+}
+export function crossesClockChange(view: LocalView) {
+  return wall(view.start_local).offset !== wall(view.end_local).offset;
+}

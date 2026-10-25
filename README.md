@@ -2,7 +2,7 @@
 
 Turn what you know into what you want to learn. A local React workspace uses three Gemini specialists in LangGraph and a real custom MCP server to propose reciprocal learning exchanges across a global cohort.
 
-**Current status:** local domain, MCP, workflow, API and browser acceptance checks pass. Live `gemini-3.8-flash` metadata is accessible, but generation returned HTTP 503 (high demand) during setup. A complete live model workflow is **not yet verified**. No model was substituted. Mem0 and Pinecone remain disabled pending that check.
+**Current status:** local domain, MCP, workflow, API and browser acceptance checks pass. Live `gemini-3.8-flash` metadata is accessible, but generation returned HTTP 503 (high demand) and HTTP 504 (deadline exceeded) during setup. A complete live model workflow is **not yet verified**. No model was substituted. Mem0 and Pinecone remain disabled pending that check.
 
 Approval saves an **unconfirmed proposal**. It does not book sessions, reserve availability, or contact anyone. All 15 profiles are fictional. Dates are October 26–30, 2026.
 
@@ -44,7 +44,7 @@ The live smoke explicitly approves one fictional proposal, then reloads it throu
 3. Approve the exact fingerprint to save. Reload and download its JSON. A SQLite checkpoint preserves an approval or clarification across process restart.
 4. Use **Revise my exchange** and optional explicit exclusions for a new child run. The old pending run is cancelled. **New search** clears the browser's current selection, not saved records.
 
-Only the four read/validation tools reach LLM roles. Host-only save/status calls enforce current revision, exact sessions, immutable exclusions, fingerprint, scope, and idempotency. A lost save response triggers status lookup before retry; **Recover save** handles an unresolved outcome without creating a second proposal.
+Only the four read/validation tools reach LLM roles. Host-only save/status calls enforce current revision, exact sessions, immutable exclusions, fingerprint, scope, and idempotency. A lost save response triggers status lookup before retry; **Recover save** handles an unresolved outcome without creating a second proposal. Recovery has a separate 30-second host-only window even if the 90-second investigation budget is exhausted; it cannot add model time or change the approved plan.
 
 ## Demo scenarios
 

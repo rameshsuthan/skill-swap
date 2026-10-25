@@ -91,6 +91,9 @@ class RunService:
         async with self.model_lock:
             for attempt in range(2):
                 rec = self.record(rid)
+                elapsed = time.monotonic() - self.started.get(rid, time.monotonic())
+                if rec["active_seconds"] + elapsed >= 90:
+                    raise TimeoutError("investigation_budget_exhausted")
                 if rec["model_calls"] >= 16:
                     raise ValueError("model_call_budget_exhausted")
                 await asyncio.to_thread(self.update, rid, model_calls=rec["model_calls"] + 1)
@@ -318,9 +321,18 @@ class RunService:
 
     async def drive(self, rid, value):
         start = time.monotonic()
+        self.started[rid] = start
         previous = self.record(rid)["active_seconds"]
         try:
-            remaining = 90 - previous
+            checkpoint = await self.graph.aget_state(self.config(rid))
+            recovering_commit = (
+                value is None
+                and checkpoint.values.get("status") == "committing"
+                and "commit" in checkpoint.next
+            )
+            # Recovery reads/saves only the already-approved exact key. It cannot
+            # spend more model time when the investigation budget is exhausted.
+            remaining = 30 if recovering_commit else 90 - previous
             if remaining <= 0:
                 raise TimeoutError()
             async with asyncio.timeout(remaining):

@@ -15,7 +15,7 @@ import ActivityDrawer from "./components/ActivityDrawer";
 
 const errorText: Record<string, string> = {
   provider_unavailable:
-    "Gemini is experiencing high demand. Your search is saved; try a new search when service recovers.",
+    "Gemini is unavailable or timed out. Your search is saved; try a new search when service recovers.",
   quota_limited:
     "Gemini quota is temporarily limited. Your search is saved. Try again after your quota resets.",
   provider_access_denied:
