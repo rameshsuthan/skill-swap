@@ -1,11 +1,174 @@
-import {ArrowRight,Globe2,Repeat2,Check,Network} from 'lucide-react';
-import type {Plan,Profile} from '../types';
-import {Avatar,skill} from './LearnerPanel';
-import {viewerTime} from '../time';
-export default function ExchangeGraph({plan,profiles,viewerZone,busy}:{plan:Plan|null;profiles:Profile[];viewerZone:string;busy:boolean}){
- const members=plan?.cycle.member_ids.map(id=>profiles.find(p=>p.id===id)!).filter(Boolean)||[];
- return <section className="exchange-panel"><div className="section-heading"><div><div className="eyebrow"><span className="step-dot">2</span> THE EXCHANGE</div><h2>{plan?'Everyone has something to offer.':'Your next chapter starts with a connection.'}</h2></div><span className="pill"><Globe2 size={13}/> Remote, worldwide</span></div>
- {plan?<><div className="graph-stage"><svg className="connection-lines" viewBox="0 0 600 360" aria-hidden="true"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#62a18b"/></marker></defs>{members.length===3?<><path d="M 250 112 Q 135 140 145 224"/><path d="M 220 285 Q 300 320 380 285"/><path d="M 455 224 Q 465 140 350 112"/></>:<><path d="M 220 150 Q 300 85 380 150"/><path d="M 380 230 Q 300 290 220 230"/></>}</svg><div className={'graph-members count-'+members.length}>{members.map((p,i)=><div key={p.id} className={'graph-person person-'+i}><Avatar profile={p} large/><strong>{p.display_name}{i===0&&<small>You</small>}</strong><span>{p.city}</span><div className="teaches">Shares {skill(p.offer.skill_id)}</div></div>)}</div><div className="cycle-center"><Repeat2 size={23}/><span>{members.length}-person<br/>exchange</span></div></div>
- <div className="graph-key"><span><i/> A skill shared</span><span><Check size={13}/> Reciprocity verified</span><span>30 min per session</span></div><div className="flow-list">{plan.sessions.map((s,i)=><div key={i}><span className="flow-number">0{i+1}</span><span><b>{profiles.find(p=>p.id===s.teacher_id)?.display_name}</b><ArrowRight size={13}/><b>{profiles.find(p=>p.id===s.learner_id)?.display_name}</b><small>{skill(s.skill_id)}</small></span><time>{viewerTime(s.start_utc,viewerZone)}</time></div>)}</div><div className="viewer-note">Times above in {viewerZone}. Both local times appear in the proposal.</div></>:<div className={'empty-graph'+(busy?' working':'')}><div className="orb orb-one">Py</div><div className="orb orb-two">Aa</div><div className="orb orb-three">SQL</div><div className="empty-icon"><Network size={38} strokeWidth={1.2}/></div><h3>{busy?'Finding the give and take…':'A good match goes both ways.'}</h3><p>{busy?'Your specialists are checking skills, reciprocal value, and real availability.':'A direct swap, or a circle of three. We connect what you can teach with what you want to learn.'}</p><div className="empty-steps"><span>01 · Understand</span><span>02 · Connect</span><span>03 · Review</span></div></div>}
- <div className="explain-card"><span className="small-icon"><Repeat2 size={20}/></span><div><strong>{plan?'Different timezones. Shared curiosity.':'Why an exchange circle?'}</strong><p>{plan?'Each pair meets separately. There’s no need to find one time that works for everyone.':'Maya teaches Leo. Leo teaches Nina. Nina teaches Maya. Everyone learns, even without a direct match.'}</p></div></div></section>;
+import { ArrowRight, Globe2, Repeat2, Check, Network } from "lucide-react";
+import type { Plan, Profile } from "../types";
+import { Avatar, skill } from "./LearnerPanel";
+import { viewerTime } from "../time";
+export default function ExchangeGraph({
+  plan,
+  profiles,
+  viewerZone,
+  busy,
+}: {
+  plan: Plan | null;
+  profiles: Profile[];
+  viewerZone: string;
+  busy: boolean;
+}) {
+  const members =
+    plan?.cycle.member_ids
+      .map((id) => profiles.find((p) => p.id === id)!)
+      .filter(Boolean) || [];
+  return (
+    <section className="exchange-panel">
+      <div className="section-heading">
+        <div>
+          <div className="eyebrow">
+            <span className="step-dot">2</span> THE EXCHANGE
+          </div>
+          <h2>
+            {plan
+              ? "Everyone has something to offer."
+              : "Your next chapter starts with a connection."}
+          </h2>
+        </div>
+        <span className="pill">
+          <Globe2 size={13} /> Remote, worldwide
+        </span>
+      </div>
+      {plan ? (
+        <>
+          <div className="graph-stage">
+            <svg
+              className="connection-lines"
+              viewBox="0 0 600 360"
+              aria-hidden="true"
+            >
+              <defs>
+                <marker
+                  id="arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="6"
+                  markerHeight="6"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#62a18b" />
+                </marker>
+              </defs>
+              {members.length === 3 ? (
+                <>
+                  <path d="M 250 112 Q 135 140 145 224" />
+                  <path d="M 220 285 Q 300 320 380 285" />
+                  <path d="M 455 224 Q 465 140 350 112" />
+                </>
+              ) : (
+                <>
+                  <path d="M 220 150 Q 300 85 380 150" />
+                  <path d="M 380 230 Q 300 290 220 230" />
+                </>
+              )}
+            </svg>
+            <div className={"graph-members count-" + members.length}>
+              {members.map((p, i) => (
+                <div key={p.id} className={"graph-person person-" + i}>
+                  <Avatar profile={p} large />
+                  <strong>
+                    {p.display_name}
+                    {i === 0 && <small>You</small>}
+                  </strong>
+                  <span>{p.city}</span>
+                  <span className="graph-zone">
+                    {plan.participant_timezones[p.id]}
+                  </span>
+                  <div className="teaches">
+                    Shares {skill(p.offer.skill_id)}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="cycle-center">
+              <Repeat2 size={23} />
+              <span>
+                {members.length}-person
+                <br />
+                exchange
+              </span>
+            </div>
+          </div>
+          <div className="graph-key">
+            <span>
+              <i /> A skill shared
+            </span>
+            <span>
+              <Check size={13} /> Reciprocity verified
+            </span>
+            <span>30 min per session</span>
+          </div>
+          <div className="flow-list">
+            {plan.sessions.map((s, i) => (
+              <div key={i}>
+                <span className="flow-number">0{i + 1}</span>
+                <span>
+                  <b>
+                    {profiles.find((p) => p.id === s.teacher_id)?.display_name}
+                  </b>
+                  <ArrowRight size={13} />
+                  <b>
+                    {profiles.find((p) => p.id === s.learner_id)?.display_name}
+                  </b>
+                  <small>{skill(s.skill_id)}</small>
+                </span>
+                <time>{viewerTime(s.start_utc, viewerZone)}</time>
+              </div>
+            ))}
+          </div>
+          <div className="viewer-note">
+            Times above in {viewerZone}. Both local times appear in the
+            proposal.
+          </div>
+        </>
+      ) : (
+        <div className={"empty-graph" + (busy ? " working" : "")}>
+          <div className="orb orb-one">Py</div>
+          <div className="orb orb-two">Aa</div>
+          <div className="orb orb-three">SQL</div>
+          <div className="empty-icon">
+            <Network size={38} strokeWidth={1.2} />
+          </div>
+          <h3>
+            {busy
+              ? "Finding the give and take…"
+              : "A good match goes both ways."}
+          </h3>
+          <p>
+            {busy
+              ? "Your specialists are checking skills, reciprocal value, and real availability."
+              : "A direct swap, or a circle of three. We connect what you can teach with what you want to learn."}
+          </p>
+          <div className="empty-steps">
+            <span>01 · Understand</span>
+            <span>02 · Connect</span>
+            <span>03 · Review</span>
+          </div>
+        </div>
+      )}
+      <div className="explain-card">
+        <span className="small-icon">
+          <Repeat2 size={20} />
+        </span>
+        <div>
+          <strong>
+            {plan
+              ? "Different timezones. Shared curiosity."
+              : "Why an exchange circle?"}
+          </strong>
+          <p>
+            {plan
+              ? "Each pair meets separately. There’s no need to find one time that works for everyone."
+              : "Maya teaches Leo. Leo teaches Nina. Nina teaches Maya. Everyone learns, even without a direct match."}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
 }
