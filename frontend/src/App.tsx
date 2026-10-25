@@ -23,6 +23,8 @@ const errorText: Record<string, string> = {
     "Gemini access was denied. Check the configured API key and model access.",
   execution_timeout:
     "This search reached its 90-second active limit. Start a fresh search to try again.",
+  planning_error:
+    "The matching agent could not select a valid proposal after one correction attempt. Nothing was saved. Start a new search to try again.",
   execution_error:
     "The search could not finish. Check the provider status and activity, then try again.",
   stopped: "This search reached its safety budget. Start a fresh search.",

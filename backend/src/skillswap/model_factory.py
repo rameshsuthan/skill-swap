@@ -18,6 +18,8 @@ def make_model(settings):
 
 def error_code(exc):
     text = str(exc).lower()
+    if text in {"invalid_plan_selection", "unsupported_plan_selection"}:
+        return "planning_error"
     if "429" in text or "resource_exhausted" in text:
         return "quota_limited"
     if "503" in text or "504" in text or "unavailable" in text or "deadline_exceeded" in text:

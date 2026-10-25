@@ -242,3 +242,50 @@ async def test_saved_proposal_recovery_survives_exhausted_active_budget(service)
     assert recovered["result"]["plan"]["fingerprint"] == before["plan"]["fingerprint"]
     with Repository(service.settings.domain_db).connection() as db:
         assert db.execute("SELECT COUNT(*) FROM proposals").fetchone()[0] == 1
+
+
+@pytest.mark.parametrize("invalid_fingerprint", [None, "invented-plan"])
+async def test_invalid_selection_gets_one_correction_before_review(service, invalid_fingerprint):
+    import json
+
+    original = service.agents.model.ainvoke
+    selections = 0
+
+    async def invalid_once(messages):
+        nonlocal selections
+        if service.agents.model.schema and json.loads(messages[1].content)["role"] == "coordinator":
+            selections += 1
+            if selections == 1:
+                return {"fingerprint": invalid_fingerprint, "summary": "No proposal selected."}
+        return await original(messages)
+
+    service.agents.model.ainvoke = invalid_once
+    rid = await service.start("maya", "Presentation design")
+    state = await wait(service, rid)
+    assert state["status"] == "awaiting_approval"
+    assert selections == 2
+    assert state["model_calls"] == 8
+    assert state["result"] is None
+
+
+async def test_repeated_invalid_selection_stops_with_specific_error(service):
+    import json
+
+    original = service.agents.model.ainvoke
+    selections = 0
+
+    async def invalid_always(messages):
+        nonlocal selections
+        if service.agents.model.schema and json.loads(messages[1].content)["role"] == "coordinator":
+            selections += 1
+            return {"fingerprint": None, "summary": "No proposal selected."}
+        return await original(messages)
+
+    service.agents.model.ainvoke = invalid_always
+    rid = await service.start("maya", "Presentation design")
+    state = await wait(service, rid)
+    assert state["status"] == "planning_error"
+    assert selections == 2
+    assert state["model_calls"] == 6
+    assert state["plan"] is None
+    assert state["result"] is None

@@ -1,10 +1,11 @@
 import copy
 import json
+from typing import Literal
 
 import jsonref
 from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, create_model
 
 from .mcp_router import ROLE_TOOLS
 from .models import LearningGoal
@@ -111,6 +112,14 @@ class AgentRoles:
         schema = {"interpreter": Interpretation, "coordinator": Coordination, "reviewer": Review}[
             role
         ]
+        if role == "coordinator":
+            fingerprints = tuple(p["fingerprint"] for p in results["find_exchange_cycles"]["plans"])
+            # The model selects from authoritative options; an empty or invented
+            # selection is invalid whenever at least one feasible plan exists.
+            choice = Literal[fingerprints] if fingerprints else Literal[None]
+            schema = create_model(
+                "CoordinationChoice", __base__=Coordination, fingerprint=(choice, ...)
+            )
         for attempt in range(2):
             try:
                 output = await self.invoke(
@@ -120,10 +129,16 @@ class AgentRoles:
                 break
             except (ValidationError, OutputParserException):
                 if attempt:
+                    if role == "coordinator":
+                        raise ValueError("invalid_plan_selection") from None
                     raise
                 messages.append(
                     HumanMessage(
-                        content="The structured output was invalid. Return only the requested schema using the existing tool evidence."
+                        content=(
+                            "The selection was invalid. Select one of the exact fingerprints in the returned feasible plans; return null only when that list is empty. Do not change the proposal."
+                            if role == "coordinator"
+                            else "The structured output was invalid. Return only the requested schema using the existing tool evidence."
+                        )
                     )
                 )
 

@@ -33,3 +33,7 @@ Connected to hosted Mem0 via the application MCP client, discovered the vendor t
 Added explicit preference controls, durable pending operations, scoped reconciliation after lost responses, and honest acknowledgement of unresolved outcomes. The interpreter fixes the hard goal before reading memory; the coordinator gets preferences only for feasible-option ranking. Added an opt-in alternatives scenario so the original three-cycle demo remains unchanged.
 
 Independent review found three Important issues: memory could reach goal interpretation, missing event IDs could strand the UI, and failed discovery could permanently suppress retrieval. Each was reproduced and fixed with regression coverage. No Critical or deferred Minor findings. Production auth remains outside this local single-operator prototype; live service claims are verified separately from controlled tests.
+
+## Search selection correction
+
+Investigated the user's generic search failure through sanitized activity and durable checkpoint task errors. Provider calls were successful; the model selected null despite a feasible result. Constrained the coordinator's structured selection to the tool's returned fingerprints and reused the single bounded correction attempt. Added a specific error for persistent invalid selections. Verified the same live request through the restarted app, stopping at human approval, and added three regression cases. No model change, fallback selection, or automatic save.
