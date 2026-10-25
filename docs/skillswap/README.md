@@ -8,7 +8,7 @@ SkillSwap helps a worldwide remote learning community discover reciprocal teachi
 - [Implementation plan](../superpowers/plans/2026-10-24-skillswap.md)
 - [Architecture and component diagrams](architecture.md)
 
-The first delivery is a local, single-operator demonstration with 15 fictional profiles, real model calls, a real custom MCP server/client, and reviewable exchange proposals. Mem0 and Pinecone through MCP are bonus milestones with separate live verification.
+The first delivery is a local, single-operator demonstration with 15 fictional profiles, real model calls, a real custom MCP server/client, and reviewable exchange proposals. Mem0 through MCP now has explicit preference controls and separately verified live CRUD; Pinecone remains an optional future milestone. See the startup guide for configuration and the memory-alternatives demo.
 
 Planning defaults: React and TypeScript UI; Python/FastAPI backend; LangGraph orchestration; SQLite for domain records and durable checkpoints; one learning cohort. The user confirmed `gemini-3.8-flash` on the free tier. Credentials, quota, and actual integration success remain setup checks.
 

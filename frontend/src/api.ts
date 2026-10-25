@@ -35,3 +35,31 @@ export const resumeRun = (id: string, body: unknown) =>
 export const getProviders = () => request<Providers>("/providers");
 export const downloadProposal = (id: string, member: string) =>
   "/api/proposals/" + id + "/export?member_id=" + encodeURIComponent(member);
+
+export const getMemories = (member: string) =>
+  request<import("./types").MemoryState>(
+    "/memories?member_id=" + encodeURIComponent(member),
+  );
+export const remember = (member_id: string, text: string) =>
+  request<import("./types").MemoryWrite>("/memories", { member_id, text });
+export const editMemory = (member_id: string, id: string, text: string) =>
+  request<import("./types").MemoryWrite>(
+    "/memories/" + encodeURIComponent(id) + "/update",
+    { member_id, text },
+  );
+export const forgetMemory = (member_id: string, id: string) =>
+  request<import("./types").MemoryWrite>(
+    "/memories/" + encodeURIComponent(id) + "/forget",
+    { member_id },
+  );
+export const checkMemory = (member_id: string, id: string) =>
+  request<import("./types").MemoryWrite>(
+    "/memory-operations/" + encodeURIComponent(id) + "/check",
+    { member_id },
+  );
+
+export const acknowledgeMemory = (member_id: string, id: string) =>
+  request<import("./types").MemoryWrite>(
+    "/memory-operations/" + encodeURIComponent(id) + "/acknowledge",
+    { member_id },
+  );

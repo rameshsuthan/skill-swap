@@ -49,3 +49,53 @@ def test_api_context_approval_export_and_event_replay(tmp_path):
         )
         assert c.get(f"/api/proposals/{pid}/export?member_id=leo").status_code == 404
         assert c.get("/api/runs/unknown").status_code == 404
+
+
+def test_memory_api_requires_selected_member_and_explicit_actions(tmp_path):
+    from skillswap.vendor_memory import MemoryService
+    from test_memory_scope import MemoryClient
+
+    settings = Settings(
+        mem0_enabled=True,
+        mem0_api_key="test",
+        domain_db=tmp_path / "domain.sqlite",
+        checkpoint_db=tmp_path / "check.sqlite",
+    )
+    client = MemoryClient()
+    memory = MemoryService(settings, client_factory=lambda: client)
+    with TestClient(create_app(settings, ControlledModel(), memory=memory)) as c:
+        assert c.get("/api/memories?member_id=maya").json()["memories"] == []
+        assert not any(name == "add_memory" for name, _ in client.calls)
+        assert (
+            c.post(
+                "/api/memories", json={"member_id": "maya", "text": "discussion", "user_id": "leo"}
+            ).status_code
+            == 422
+        )
+        assert (
+            c.post("/api/memories", json={"member_id": "unknown", "text": "discussion"}).status_code
+            != 200
+        )
+        saved = c.post(
+            "/api/memories", json={"member_id": "maya", "text": "I like discussion."}
+        ).json()
+        assert saved["status"] == "saved"
+        mid = saved["memory_id"]
+        assert c.get("/api/memories?member_id=leo").json()["memories"] == []
+        assert c.post(f"/api/memories/{mid}/forget", json={"member_id": "leo"}).status_code == 409
+        assert (
+            c.post(
+                f"/api/memories/{mid}/update",
+                json={"member_id": "maya", "text": "I like projects."},
+            ).json()["status"]
+            == "saved"
+        )
+        assert (
+            c.get("/api/memories?member_id=maya").json()["memories"][0]["text"]
+            == "I like projects."
+        )
+        assert (
+            c.post(f"/api/memories/{mid}/forget", json={"member_id": "maya"}).json()["status"]
+            == "saved"
+        )
+        assert c.get("/api/memories?member_id=maya").json()["memories"] == []

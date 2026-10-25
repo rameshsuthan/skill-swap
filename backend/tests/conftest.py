@@ -21,3 +21,9 @@ def actor():
 @pytest.fixture
 def profiles(repo, actor):
     return [MemberProfile.model_validate(p) for p in repo.get_context(actor)["profiles"]]
+
+
+@pytest.fixture(autouse=True)
+def disable_live_bonuses(monkeypatch):
+    # Unit/integration checks never consume the developer's live vendor credentials.
+    monkeypatch.setenv("SKILLSWAP_MEM0_ENABLED", "false")

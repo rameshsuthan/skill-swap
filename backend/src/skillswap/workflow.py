@@ -25,6 +25,7 @@ class RunState(TypedDict, total=False):
     revisions: int
     message: str
     decision: dict
+    preferences: list[dict]
 
 
 class RunService:
@@ -122,14 +123,19 @@ class RunService:
     def build(self, saver):
         async def interpret(state):
             ctx = ActorContext.model_validate(state["actor"])
-            out, _ = await self.agents.run("interpreter", ctx, {"request": state["request"]})
+            out, results = await self.agents.run("interpreter", ctx, {"request": state["request"]})
             if out.goal is None:
                 return {
                     "status": "awaiting_clarification",
                     "question": out.clarification
                     or "Which supported skill would you like to learn?",
                 }
-            return {"goal": out.goal.model_dump(), "status": "running", "question": None}
+            return {
+                "goal": out.goal.model_dump(),
+                "status": "running",
+                "question": None,
+                "preferences": results.get("search_memories", {}).get("memories", []),
+            }
 
         def clarify(state):
             answer = interrupt({"kind": "clarification", "question": state["question"]})
@@ -147,6 +153,10 @@ class RunService:
                     "message": "Automatic revision budget exhausted. Start a new search.",
                 }
             ctx = ActorContext.model_validate(state["actor"])
+            preferences = state.get("preferences", [])
+            if state.get("revisions", 0) and self.router.memory.enabled:
+                facts = await self.router.memory.search(ctx, "learning and teaching preferences")
+                preferences = [f.model_dump() for f in facts]
             out, results = await self.agents.run(
                 "coordinator",
                 ctx,
@@ -154,6 +164,7 @@ class RunService:
                     "request": state["request"],
                     "goal": state["goal"],
                     "feedback": state.get("message", ""),
+                    "remembered_preferences": preferences,
                 },
             )
             plans = results["find_exchange_cycles"]["plans"]

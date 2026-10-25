@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -6,11 +6,12 @@ import {
   RotateCcw,
   AlertCircle,
 } from "lucide-react";
-import type { Context, Run, Activity, Providers } from "./types";
+import type { Context, Run, Activity, Providers, MemoryState } from "./types";
 import * as api from "./api";
 import LearnerPanel from "./components/LearnerPanel";
 import ExchangeGraph from "./components/ExchangeGraph";
 import ProposalPanel from "./components/ProposalPanel";
+import MemoryPanel from "./components/MemoryPanel";
 import ActivityDrawer from "./components/ActivityDrawer";
 
 const errorText: Record<string, string> = {
@@ -47,6 +48,12 @@ export default function App() {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const seq = useRef(0);
+  const updateMemoryProvider = useCallback(
+    (provider: MemoryState["provider"]) => {
+      setProviders((previous) => ({ ...previous, mem0: provider }));
+    },
+    [],
+  );
   useEffect(() => {
     let current = true;
     api
@@ -243,6 +250,12 @@ export default function App() {
           />
         </div>
         <ActivityDrawer events={events} busy={!!busy} />
+        <MemoryPanel
+          key={member}
+          member={member}
+          name={current?.display_name || member}
+          onProvider={updateMemoryProvider}
+        />
         <div className="provider-strip">
           <span className="provider-caption">CONNECTED SERVICES</span>
           {["skillswap", "gemini", "mem0", "pinecone"].map((name) => (
@@ -263,7 +276,9 @@ export default function App() {
                 {providers[name]?.mode === "live"
                   ? "live"
                   : providers[name]?.mode === "test"
-                    ? "test model"
+                    ? name === "gemini"
+                      ? "test model"
+                      : "test provider"
                     : providers[name]?.mode === "connecting"
                       ? "not verified"
                       : providers[name]?.mode || "offline"}

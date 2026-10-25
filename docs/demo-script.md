@@ -21,3 +21,7 @@ Approve the old view. The app must revise to October 28 and require a new approv
 **4:30–5:00 — Boundaries.** Nothing is booked or sent. No real participant agreement. Mem0/Pinecone are disabled until separately verified. If Gemini returns 503 or quota errors, show the actual stopped state and explain the provider blocker; never splice a test fixture into a purported live run.
 
 Before the next recording, reset the fictional profiles with `scripts/seed_demo.py`. Reset increments dataset revision and preserves saved proposal history. Keep API keys and terminal environment output out of the recording.
+
+## Optional Mem0 segment
+
+Enable the bonus in `.env` and restart. Run `scripts/demo_scenario.py memory-alternatives` before this segment. Request presentation design as Maya: the default direct exchange uses Olivia. In Learning preferences, explicitly Remember “I prefer guided-project teaching over discussion for my learning.” Start a fresh search and show Nina's declared guided-project offer supporting the three-member alternative. Show the actual `mem0 / search_memories` activity, then Edit or Forget the preference. Reset seed data afterward. Pause between live searches if Gemini reports a quota limit; never substitute a model automatically.

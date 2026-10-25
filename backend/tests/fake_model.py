@@ -69,8 +69,25 @@ class ControlledModel:
         tool = self.tools[0]["function"]["name"]
         if tool == "get_learning_context":
             args = {}
+        elif tool == "search_memories":
+            args = {"query": "teaching and learning preferences"}
         elif tool in ("search_teachers", "find_exchange_cycles"):
             args = {"goal": payload["goal"]}
+            if tool == "find_exchange_cycles":
+                preferences = " ".join(
+                    m["text"] for m in payload.get("remembered_preferences", [])
+                ).lower()
+                style = (
+                    "guided_project"
+                    if "guided" in preferences
+                    else "discussion"
+                    if "discussion" in preferences
+                    else None
+                )
+                teachers = next(r["teachers"] for r in results if "teachers" in r)
+                args["preferred_member_ids"] = [
+                    t["id"] for t in teachers if style in t["offer"]["styles"]
+                ]
         else:
             args = {k: payload["plan"][k] for k in ("cycle", "goal")}
             args["proposed_sessions"] = payload["plan"]["sessions"]

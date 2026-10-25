@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from fastmcp.exceptions import ToolError
+from pydantic import BaseModel, ConfigDict, Field
 
 from .mcp_router import MCPRouter
 from .model_factory import make_model
@@ -19,6 +20,17 @@ class StartRun(BaseModel):
     parent_run_id: str | None = None
 
 
+class MemoryInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    member_id: str
+    text: str = Field(min_length=1, max_length=1000)
+
+
+class MemoryActor(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    member_id: str
+
+
 class UnconfiguredModel:
     def bind_tools(self, *args, **kwargs):
         return self
@@ -27,12 +39,12 @@ class UnconfiguredModel:
         raise ValueError("google_api_key_required")
 
 
-def create_app(settings=None, model=None):
+def create_app(settings=None, model=None, memory=None):
     settings = settings or Settings()
 
     @asynccontextmanager
     async def lifespan(app):
-        async with MCPRouter(settings) as router:
+        async with MCPRouter(settings, memory=memory) as router:
             chosen = model
             if chosen is None:
                 chosen = (
@@ -65,6 +77,14 @@ def create_app(settings=None, model=None):
             return JSONResponse({"detail": "origin_not_allowed"}, status_code=403)
         return await call_next(request)
 
+    @app.exception_handler(ToolError)
+    async def tool_error(request, exc):
+        missing = str(exc).endswith("actor_not_found")
+        return JSONResponse(
+            {"detail": "actor_not_found" if missing else "mcp_tool_error"},
+            status_code=404 if missing else 502,
+        )
+
     @app.exception_handler(ValueError)
     async def value_error(request, exc):
         code = str(exc)
@@ -79,6 +99,10 @@ def create_app(settings=None, model=None):
             "invalid_exclusions",
             "parent_scope_mismatch",
             "parent_still_running",
+            "memory_not_found",
+            "memory_operation_not_found",
+            "memory_unavailable",
+            "invalid_memory_text",
         }
         return JSONResponse(
             {"detail": code if code in allowed else "invalid_operation"},
@@ -129,6 +153,53 @@ def create_app(settings=None, model=None):
             headers={"Content-Disposition": f'attachment; filename="skillswap-{proposal_id}.json"'},
         )
 
+    async def memory_actor(member_id):
+        ctx = ActorContext(
+            cohort_id=settings.cohort_id, member_id=member_id, run_id="memory-controls"
+        )
+        await app.state.router.call("skillswap", "get_learning_context", {}, ctx)
+        return ctx
+
+    @app.get("/api/memories")
+    async def memories(member_id: str):
+        ctx = await memory_actor(member_id)
+        service = app.state.router.memory
+        try:
+            facts = await service.list(ctx)
+        except ValueError:
+            facts = []
+        return {
+            "memories": facts,
+            "operations": service.operations(ctx),
+            "provider": service.provider(),
+        }
+
+    @app.post("/api/memories")
+    async def remember(body: MemoryInput):
+        return await app.state.router.memory.remember(await memory_actor(body.member_id), body.text)
+
+    @app.post("/api/memories/{memory_id}/update")
+    async def update_memory(memory_id: str, body: MemoryInput):
+        return await app.state.router.memory.update(
+            await memory_actor(body.member_id), memory_id, body.text
+        )
+
+    @app.post("/api/memories/{memory_id}/forget")
+    async def forget_memory(memory_id: str, body: MemoryActor):
+        return await app.state.router.memory.forget(await memory_actor(body.member_id), memory_id)
+
+    @app.post("/api/memory-operations/{operation_id}/check")
+    async def check_memory(operation_id: str, body: MemoryActor):
+        return await app.state.router.memory.poll_write(
+            await memory_actor(body.member_id), operation_id
+        )
+
+    @app.post("/api/memory-operations/{operation_id}/acknowledge")
+    async def acknowledge_memory(operation_id: str, body: MemoryActor):
+        return app.state.router.memory.acknowledge_unknown(
+            await memory_actor(body.member_id), operation_id
+        )
+
     @app.get("/api/providers")
     async def providers():
         with app.state.service.db() as db:
@@ -159,7 +230,7 @@ def create_app(settings=None, model=None):
                 "tier": "free-tier target; account quota not verified by API",
             },
             "skillswap": {"mode": "live", "tools": list(app.state.router.schemas)},
-            "mem0": {"mode": "disabled", "detail": "Bonus deferred until live core passes"},
+            "mem0": app.state.router.memory.provider(),
             "pinecone": {"mode": "disabled", "detail": "Bonus deferred until live core passes"},
         }
 

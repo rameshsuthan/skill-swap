@@ -2,7 +2,7 @@
 
 Turn what you know into what you want to learn. A local React workspace uses three Gemini specialists in LangGraph and a real custom MCP server to propose reciprocal learning exchanges across a global cohort.
 
-**Current status:** the local prototype and a complete live `gemini-3.5-flash-lite` workflow are verified. The user authorized this model after `gemini-3.8-flash` returned HTTP 503/504. Structured output, a real Gemini-requested MCP round trip, all three specialists, approval/save, and restart recovery passed. Mem0 and Pinecone remain optional and disabled.
+**Current status:** the local prototype and a complete live `gemini-3.5-flash-lite` workflow are verified. The user authorized this model after `gemini-3.8-flash` returned HTTP 503/504. Structured output, a real Gemini-requested MCP round trip, all three specialists, approval/save, and restart recovery passed. Mem0 preference memory now has verified live MCP CRUD, explicit UI controls, and a live fresh-session recommendation change with approval/save/recovery. Pinecone remains optional and disabled.
 
 Approval saves an **unconfirmed proposal**. It does not book sessions, reserve availability, or contact anyone. All 15 profiles are fictional. Dates are October 26–30, 2026.
 
@@ -44,7 +44,7 @@ The live smoke explicitly approves one fictional proposal, then reloads it throu
 3. Approve the exact fingerprint to save. Reload and download its JSON. A SQLite checkpoint preserves an approval or clarification across process restart.
 4. Use **Revise my exchange** and optional explicit exclusions for a new child run. The old pending run is cancelled. **New search** clears the browser's current selection, not saved records.
 
-Only the four read/validation tools reach LLM roles. Host-only save/status calls enforce current revision, exact sessions, immutable exclusions, fingerprint, scope, and idempotency. A lost save response triggers status lookup before retry; **Recover save** handles an unresolved outcome without creating a second proposal. Recovery has a separate 30-second host-only window even if the 90-second investigation budget is exhausted; it cannot add model time or change the approved plan.
+Only read/validation tools reach LLM roles, including scoped Mem0 search when enabled. Host-only save/status calls enforce current revision, exact sessions, immutable exclusions, fingerprint, scope, and idempotency. A lost save response triggers status lookup before retry; **Recover save** handles an unresolved outcome without creating a second proposal. Recovery has a separate 30-second host-only window even if the 90-second investigation budget is exhausted; it cannot add model time or change the approved plan.
 
 ## Demo scenarios
 
@@ -67,7 +67,7 @@ After a scenario, attempting old approval must produce a fresh proposal requirin
 npm --prefix frontend run build
 ```
 
-Browser tests use an explicitly separate test entry point and databases. The test model exists only in `backend/tests`; it is never selectable in the production application. MCP, SQLite, LangGraph, HTTP, and browser interactions are real.
+Browser tests use an explicitly separate test entry point and databases. Controlled model/memory boundaries exist only in `backend/tests`; they are never selectable in the production application and carry test badges. MCP, SQLite, LangGraph, HTTP, and browser interactions are real.
 
 ```bash
 export PATH="$PWD/.tools/node/bin:$PATH" # or use your installed Node
@@ -86,6 +86,27 @@ bash scripts/test_browser.sh
 - `storage/checkpoints.sqlite`: graph checkpoints, run metadata and sanitized activity.
 - [Architecture](docs/skillswap/architecture.md), [validation](docs/validation-results.md), [demo script](docs/demo-script.md), [build log](docs/build-log.md).
 
-This is a local single-operator prototype, not a public multi-user service. It has no production authentication, messaging or live calendar integration. Keep one backend worker. Matching uses full authorized-cohort skill eligibility and UTC overlap, with no geographic distance filter. LangGraph persists run-local state; no Mem0/Pinecone integration is claimed.
+This is a local single-operator prototype, not a public multi-user service. It has no production authentication, messaging or live calendar integration. Keep one backend worker. Matching uses full authorized-cohort skill eligibility and UTC overlap, with no geographic distance filter. LangGraph persists run-local state; optional Mem0 retains explicitly saved preferences. Pinecone is not yet integrated.
 
 Secrets, runtimes, dependencies and runtime databases are ignored by Git. The original handouts remain unchanged and untracked. Commits are local on `build/skillswap`; no remote repository or public deployment has been created.
+
+## Remembered preferences (Mem0 bonus)
+
+Set `SKILLSWAP_MEM0_ENABLED=true` and `MEM0_API_KEY` in the private root `.env`, then restart the backend. The application connects to the [hosted Mem0 MCP server](https://docs.mem0.ai/platform/mem0-mcp); no machine-wide MCP configuration is needed.
+
+Below the exchange workspace, **Learning preferences** supports Remember, Edit, and Forget for the selected fictional learner. Nothing is written automatically. Start a fresh search after changing a preference. Mem0 scopes each record to the project/cohort/member; other learners cannot see or mutate it through the app. These are preferences about teaching style, not changes to availability.
+
+The interpreter resolves the requested skill and proficiency before retrieving memory. The coordinator can then rank feasible exchanges using remembered styles and current profile evidence. Memory cannot override explicit exclusions, scheduling, or eligibility. An unavailable memory provider leaves the core workflow usable and displays a degraded badge.
+
+Pending changes remain unconfirmed across restart. **Check pending change** queries the known event or reconciles the unique operation marker through scoped reads; it never repeats a write. If a response is permanently lost and no result can be found, **Continue without confirmation** unlocks the controls while keeping the outcome visibly uncertain. Refresh before repeating that change because it may still appear later.
+
+```bash
+# Real vendor CRUD, fresh-session retrieval, ownership checks, and cleanup.
+.venv/bin/python scripts/smoke_mem0.py
+# Live Gemini + Mem0 on isolated fictional data; pauses between runs for quota.
+.venv/bin/python scripts/smoke_memory_workflow.py --live-model
+# Optional visible demo: adds a feasible discussion-based alternative for Maya.
+.venv/bin/python scripts/demo_scenario.py memory-alternatives
+```
+
+With the alternatives scenario, the default direct swap is Maya/Olivia. Remember “I prefer guided-project teaching over discussion for my learning,” then start a fresh search: Nina's declared guided-project style supports the Maya/Leo/Nina alternative. Reset with `scripts/seed_demo.py` to restore the original hero scenario. The live smoke uses its own learner ID and databases and deletes only its own test memory. Mem0 usage is separate from Gemini's free-tier target.

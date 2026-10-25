@@ -44,4 +44,20 @@ User requested `gemini-3.5-flash-lite` on October 25. Updated the active local s
 - Explicit smoke-script approval saved proposal `a6bd50fd-e899-4171-bc1d-9eac07864408` with status `awaiting_participant_confirmation`. No booking or messages.
 - A fresh service restored the identical saved result from SQLite: restart recovery passed.
 - Regression checks: **47 backend tests passed**, Ruff passed, TypeScript/Vite build passed. The earlier six browser cases remain the baseline; this change only replaces their model badge source.
-- Account billing tier and remaining quota are not exposed by the generation API and remain unverified. Mem0/Pinecone have not been enabled or claimed verified.
+- Account billing tier and remaining quota are not exposed by the generation API and remain unverified. At that milestone Mem0/Pinecone were not enabled; the subsequent Mem0 checks are recorded below.
+
+## Mem0 preference milestone
+
+Hosted Mem0 MCP authentication/discovery and actual application CRUD passed. The client uses bearer credentials only in transport headers; no credentials enter activity or validation output. Live add returned memory `93331386-f78d-4fc0-b2e5-4b6fd704d998`, event `1409f744-8b5a-454e-bb2e-e7b41a4fc7fe`; a new service retrieved it, another learner could not, update was reflected, and delete/absence confirmation passed. Only isolated fictional test memories were changed and cleaned up. Safe result IDs are retained in ignored local validation logs.
+
+- **60 backend tests passed** after the integration and independent-review fixes. Coverage includes host scope, foreign records/IDs, pending/failed writes, no stale content cache, lost-response reconciliation without replay, explicit acknowledgement of unknown outcomes, discovery recovery, and untrusted-memory isolation from goal/proficiency.
+- Controlled-model tests traverse real custom MCP and fresh LangGraph sessions: a preference changes a feasible Olivia swap to the Nina three-cycle; exclusions or absent availability still select the feasible alternative. Mem0 outage continues without memory.
+- **9 Playwright cases passed**, including explicit remember/edit/forget, reload, member isolation, pending/degraded behavior, and acknowledged unknown writes. Browser model and vendor responses are controlled and labeled test; local graph/MCP/API/storage are real.
+- Ruff and TypeScript/Vite production build passed. Desktop/mobile preference panels were visually inspected; no horizontal clipping.
+- The initial live two-session attempt reached approval in 8 calls/12.44s, then encountered Gemini quota limiting on the second run. Its test memory was cleaned up. The live script now spaces sessions by 65 seconds; quota failures remain visible and never trigger model substitution.
+
+Independent review found three Important issues, all addressed with regressions: goal interpretation formerly saw memory, unknown write responses could lock controls, and a discovery outage could silently suppress future memory retrieval. No Critical or deferred Minor findings.
+
+Final live two-session verification passed with `gemini-3.5-flash-lite` and actual hosted Mem0 MCP. Baseline run `7b9583ab-a1aa-4532-a5da-1f259d00ab77` reached approval in **8 calls / 16.06s**, selecting Olivia. After an explicitly remembered guided-project preference and a 65-second between-session pause, fresh run `78606081-1592-489f-9324-b6548060c4d1` reached approval in **8 calls / 15.85s**, selecting Nina. Proposal `285f0647-418f-4e93-a2bb-d563a5ff1ddc` saved and recovered unchanged in a fresh service. Test memory `1f2a1364-ac49-4733-9712-0e91661ae22e` (event `940a0680-18ec-4589-b983-2a703cd52546`) was cleaned up. A diagnostic wrapper inspected fictional reviewer arguments without altering responses; cycle, goal, and sessions matched exactly. An earlier attempt stopped at review without saving; the successful retry used the same guarded workflow.
+
+Final backend suite: **60 passed / 18.48s**. Browser suite: **9 passed / 10.3s**. Async-event coverage also reproduces the live response shape in which top-level `id` identifies the event; completion resolves the separate memory result ID and verifies ownership. Credential scan found **zero configured key values** in 76 tracked/intended source files. Mem0 is enabled in this machine's private configuration. Pinecone remains disabled.

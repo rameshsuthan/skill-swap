@@ -9,6 +9,7 @@ from fastmcp.client.transports import StdioTransport
 from .events import EventStore
 from .models import ActorContext
 from .settings import ROOT
+from .vendor_memory import MemoryService
 
 ROLE_TOOLS = {
     "interpreter": {"get_learning_context"},
@@ -24,10 +25,11 @@ ROLE_TOOLS = {
 
 
 class MCPRouter:
-    def __init__(self, settings):
+    def __init__(self, settings, memory=None):
         self.settings = settings
         self.events = EventStore(settings.checkpoint_db)
         self.schemas = {}
+        self.memory = memory or MemoryService(settings)
         self.process_transport = StdioTransport(
             command=sys.executable,
             args=["-m", "skillswap.mcp_server"],
@@ -42,6 +44,7 @@ class MCPRouter:
     async def open(self):
         await self.client.__aenter__()
         self.schemas = {t.name: t for t in await self.client.list_tools()}
+        await self.memory.open()
         return self
 
     async def close(self):
@@ -54,9 +57,20 @@ class MCPRouter:
         await self.close()
 
     async def call(self, server, tool, arguments, ctx: ActorContext, role="host"):
+        if server == "mem0":
+            if role != "interpreter" or tool != "search_memories":
+                raise ValueError("tool_not_allowed")
+            if set(arguments) != {"query"} or not isinstance(arguments["query"], str):
+                raise ValueError("scope_override")
+            facts = await self.memory.search(ctx, arguments["query"])
+            return {"memories": [f.model_dump() for f in facts], **self.memory.provider()}
         if server != "skillswap" or tool not in ROLE_TOOLS.get(role, set()):
             raise ValueError("tool_not_allowed")
         if set(arguments) & {"ctx", "member_id", "cohort_id", "run_id", "exclusions"}:
+            raise ValueError("scope_override")
+        if role == "coordinator" and set(arguments.get("excluded_member_ids", [])) - set(
+            ctx.exclusions
+        ):
             raise ValueError("scope_override")
         start = time.monotonic()
         status = "ok"

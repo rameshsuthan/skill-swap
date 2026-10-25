@@ -18,5 +18,7 @@ class Settings(BaseSettings):
     checkpoint_db: Path = Field(
         default=ROOT / "storage/checkpoints.sqlite", validation_alias="SKILLSWAP_CHECKPOINT_DB"
     )
+    mem0_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="MEM0_API_KEY")
+    mem0_enabled: bool = Field(default=False, validation_alias="SKILLSWAP_MEM0_ENABLED")
     cohort_id: str = "global-2026"
     demo_mode: bool = True

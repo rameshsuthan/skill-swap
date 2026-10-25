@@ -174,5 +174,175 @@ r.update_profile('bruno',availability=[window('2026-11-01T03:45','2026-11-01T04:
   await expect(
     page.getByText("Clock change during this session", { exact: true }),
   ).toBeVisible();
-  await page.screenshot({path:"test-results/clock-change.png",fullPage:true});
+  await page.screenshot({
+    path: "test-results/clock-change.png",
+    fullPage: true,
+  });
+});
+
+test("memory_explicit_remember_edit_forget_and_member_scope", async ({
+  page,
+}) => {
+  await page
+    .getByLabel("A preference for future searches")
+    .fill("I prefer guided projects.");
+  await page.getByRole("button", { name: "Remember", exact: true }).click();
+  await expect(
+    page.getByText("Preference saved for future searches."),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByText("I prefer guided projects.", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Learner").selectOption("leo");
+  await expect(
+    page.getByText("I prefer guided projects.", { exact: true }),
+  ).not.toBeVisible();
+  await page.getByLabel("Learner").selectOption("maya");
+  await page
+    .getByRole("button", { name: "Edit preference: I prefer guided projects." })
+    .click();
+  await page
+    .getByLabel("Edit learning preference")
+    .fill("I prefer discussion.");
+  await page
+    .getByRole("button", { name: "Save preference", exact: true })
+    .click();
+  await expect(
+    page.getByText("I prefer discussion.", { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/memory-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "test-results/memory-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBeTruthy();
+  await page
+    .getByRole("button", { name: "Forget preference: I prefer discussion." })
+    .click();
+  await expect(page.getByText("Preference forgotten.")).toBeVisible();
+  await expect(
+    page.getByText("I prefer discussion.", { exact: true }),
+  ).not.toBeVisible();
+});
+
+test("memory_pending_and_degraded_states_are_honest", async ({ page }) => {
+  let checked = false;
+  const operation = {
+    operation_id: "controlled-event",
+    status: "pending",
+    event_id: "vendor-event",
+    memory_id: null,
+    detail: "Waiting for Mem0 confirmation.",
+  };
+  await page.route("**/api/memories?*", (route) =>
+    route.fulfill({
+      json: {
+        memories: [],
+        operations: [
+          {
+            ...operation,
+            status: checked ? "failed" : "pending",
+            detail: checked
+              ? "Mem0 did not save this change."
+              : operation.detail,
+          },
+        ],
+        provider: {
+          mode: "degraded",
+          detail:
+            "Mem0 unavailable. Matching continues without remembered preferences.",
+        },
+      },
+    }),
+  );
+  await page.route(
+    "**/api/memory-operations/controlled-event/check",
+    (route) => {
+      checked = true;
+      return route.fulfill({
+        json: {
+          ...operation,
+          status: "failed",
+          detail: "Mem0 did not save this change.",
+        },
+      });
+    },
+  );
+  await page.reload();
+  await expect(page.getByText(/Pending ·/)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Remember", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Check pending change" }).click();
+  await expect(page.getByText("Mem0 did not save this change.")).toBeVisible();
+  await expect(
+    page.getByText("Preference saved for future searches."),
+  ).not.toBeVisible();
+  await propose(page);
+});
+
+test("unknown_memory_outcome_can_be_acknowledged_without_retry", async ({
+  page,
+}) => {
+  let acknowledged = false;
+  const operation = {
+    operation_id: "lost-response",
+    status: "pending",
+    event_id: null,
+    memory_id: null,
+    detail: "Outcome unconfirmed.",
+  };
+  await page.route("**/api/memories?*", (route) =>
+    route.fulfill({
+      json: {
+        memories: [],
+        operations: [
+          {
+            ...operation,
+            acknowledged,
+            detail: acknowledged
+              ? "Outcome still unconfirmed; the change may appear later."
+              : operation.detail,
+          },
+        ],
+        provider: { mode: "test", detail: "Controlled memory boundary" },
+      },
+    }),
+  );
+  await page.route(
+    "**/api/memory-operations/lost-response/acknowledge",
+    (route) => {
+      acknowledged = true;
+      return route.fulfill({ json: { ...operation, acknowledged } });
+    },
+  );
+  await page.reload();
+  await expect(
+    page.getByLabel("A preference for future searches"),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Continue without confirmation" })
+    .click();
+  await expect(
+    page.getByLabel("A preference for future searches"),
+  ).toBeEnabled();
+  await expect(page.getByText(/Unconfirmed ·/)).toBeVisible();
+  await expect(
+    page.getByText("Preference saved for future searches."),
+  ).not.toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBeTruthy();
 });

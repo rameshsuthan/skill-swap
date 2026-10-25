@@ -75,3 +75,18 @@ export type Context = {
   catalog: Record<string, string>;
   dataset_revision: number;
 };
+
+export type MemoryFact = { id: string; text: string };
+export type MemoryWrite = {
+  operation_id: string;
+  acknowledged: boolean;
+  status: "pending" | "saved" | "failed";
+  memory_id: string | null;
+  event_id: string | null;
+  detail: string;
+};
+export type MemoryState = {
+  memories: MemoryFact[];
+  operations: MemoryWrite[];
+  provider: { mode: string; detail: string };
+};

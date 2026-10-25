@@ -263,3 +263,9 @@ erDiagram
 ## Verification boundary
 
 The SVGs use embedded vector elements and system fonts, with accessible titles/descriptions and no external assets. XML parsing and file/link checks can establish structural integrity; they do not establish browser rendering or Mermaid compilation. Runtime transport, credentials, persistence, and model behavior require implementation-time verification described in the spec.
+
+## Implemented Mem0 boundary (October 25 update)
+
+The hosted MCP client injects `skillswap-demo:<cohort_id>:<member_id>` into vendor identity and verifies all project/cohort/member metadata on returned rows. The interpreter first resolves skill/proficiency without any memory content, then requests scoped memory search. Only the coordinator sees retrieved preferences, for soft ranking against canonical profile styles. Domain MCP still validates every cycle and session.
+
+The UI invokes explicit host-only mutations. Additional host-only `get_memory` and `get_memories` calls validate record ownership and populate the panel; these are not agent tools. No bulk/entity administration is registered. Pending operations persist IDs, scope and content hashes in the checkpoint database. Known events are polled; lost responses are reconciled through operation markers and scoped reads. An explicitly acknowledged unknown outcome remains visibly unconfirmed. There is no automatic retry of memory writes. Failed discovery can be retried on a later fresh run; failed reads leave deterministic matching available.
