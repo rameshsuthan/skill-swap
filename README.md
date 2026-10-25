@@ -2,7 +2,7 @@
 
 Turn what you know into what you want to learn. A local React workspace uses three Gemini specialists in LangGraph and a real custom MCP server to propose reciprocal learning exchanges across a global cohort.
 
-**Current status:** the local prototype and a complete live `gemini-3.5-flash-lite` workflow are verified. The user authorized this model after `gemini-3.8-flash` returned HTTP 503/504. Structured output, a real Gemini-requested MCP round trip, all three specialists, approval/save, and restart recovery passed. Mem0 preference memory now has verified live MCP CRUD, explicit UI controls, and a live fresh-session recommendation change with approval/save/recovery. Pinecone remains optional and disabled.
+**Current status:** the local prototype and a complete live `gemini-3.5-flash-lite` workflow are verified. The user authorized this model after `gemini-3.8-flash` returned HTTP 503/504. Structured output, a real Gemini-requested MCP round trip, all three specialists, approval/save, and restart recovery passed. Mem0 preference memory now has verified live MCP CRUD, explicit UI controls, and a live fresh-session recommendation change with approval/save/recovery. Pinecone semantic discovery is also verified through its official MCP server; the complete workflow with all three MCP servers passed.
 
 Approval saves an **unconfirmed proposal**. It does not book sessions, reserve availability, or contact anyone. All 15 profiles are fictional. Dates are October 26–30, 2026.
 
@@ -86,7 +86,7 @@ bash scripts/test_browser.sh
 - `storage/checkpoints.sqlite`: graph checkpoints, run metadata and sanitized activity.
 - [Architecture](docs/skillswap/architecture.md), [validation](docs/validation-results.md), [demo script](docs/demo-script.md), [build log](docs/build-log.md).
 
-This is a local single-operator prototype, not a public multi-user service. It has no production authentication, messaging or live calendar integration. Keep one backend worker. Matching uses full authorized-cohort skill eligibility and UTC overlap, with no geographic distance filter. LangGraph persists run-local state; optional Mem0 retains explicitly saved preferences. Pinecone is not yet integrated.
+This is a local single-operator prototype, not a public multi-user service. It has no production authentication, messaging or live calendar integration. Keep one backend worker. Matching uses full authorized-cohort skill eligibility and UTC overlap, with no geographic distance filter. LangGraph persists run-local state; optional Mem0 retains explicitly saved preferences. Pinecone provides advisory semantic ordering; every exchange still passes the full deterministic matcher.
 
 Secrets, runtimes, dependencies and runtime databases are ignored by Git. The original handouts remain unchanged and untracked. Commits are local on `build/skillswap`; no remote repository or public deployment has been created.
 
@@ -110,3 +110,26 @@ Pending changes remain unconfirmed across restart. **Check pending change** quer
 ```
 
 With the alternatives scenario, the default direct swap is Maya/Olivia. Remember “I prefer guided-project teaching over discussion for my learning,” then start a fresh search: Nina's declared guided-project style supports the Maya/Leo/Nina alternative. Reset with `scripts/seed_demo.py` to restore the original hero scenario. The live smoke uses its own learner ID and databases and deletes only its own test memory. Mem0 usage is separate from Gemini's free-tier target.
+
+## Semantic discovery (Pinecone bonus)
+
+The app runs the official [Pinecone MCP server](https://docs.pinecone.io/guides/operations/mcp-server), pinned to `@pinecone-database/mcp@0.3.0`. Install its separate local dependencies:
+
+```bash
+npm --prefix integrations/pinecone ci --ignore-scripts
+```
+
+Set `PINECONE_API_KEY`, `PINECONE_INDEX=skillswap-demo`, `PINECONE_NAMESPACE=global-2026`, and `SKILLSWAP_PINECONE_ENABLED=true` in the private `.env`, then restart. This machine is configured and its dedicated index contains 15 fictional public offers. The user authorized normal prototype usage on the existing paid plan; no billing plan was changed. Existing indexes were left alone.
+
+For a new account/project, the following explicit setup command creates the configured SkillSwap index if missing and upserts the public offers. It uses the account's existing billing plan, AWS us-east-1, and integrated `llama-text-embed-v2` embeddings. Check your [Pinecone plan and usage](https://www.pinecone.io/pricing/) before setup. There are no account upgrades or reranking calls.
+
+```bash
+.venv/bin/python scripts/seed_pinecone.py --create-index
+.venv/bin/python scripts/smoke_pinecone.py
+```
+
+`search-records` is the only Pinecone tool available at runtime. The host injects index, namespace, project/cohort/active filters, hydrates results through custom MCP, discards stale offers, and checks skill/proficiency and exclusions. Vendor text never becomes authoritative profile evidence. Five semantic hits can suggest ordering; all authorized cohort members still participate in deterministic cycle/schedule search.
+
+The activity drawer shows actual `pinecone / search-records` calls. A search-method label distinguishes semantic suggestions from full local search. If Pinecone is unavailable, matching continues with a labeled local fallback. Per-run status is captured independently so simultaneous successes and failures cannot exchange labels. Re-seed after changing public teaching offers; availability changes remain authoritative in SQLite and do not require re-embedding.
+
+With both bonuses enabled, a normal live search uses nine model calls. Gemini quota still applies; space repeated live searches rather than changing models. Production authentication, calendar bookings, public publishing, and recording/uploading the demo video remain outside this local prototype.

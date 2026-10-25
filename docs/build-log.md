@@ -37,3 +37,11 @@ Independent review found three Important issues: memory could reach goal interpr
 ## Search selection correction
 
 Investigated the user's generic search failure through sanitized activity and durable checkpoint task errors. Provider calls were successful; the model selected null despite a feasible result. Constrained the coordinator's structured selection to the tool's returned fingerprints and reused the single bounded correction attempt. Added a specific error for persistent invalid selections. Verified the same live request through the restarted app, stopping at human approval, and added three regression cases. No model change, fallback selection, or automatic save.
+
+## Pinecone milestone and integrated showcase
+
+Confirmed a real authenticated official MCP round trip and inspected the published tool schemas. The user confirmed a paid Pinecone plan and authorized normal prototype usage. Created a separate `skillswap-demo` integrated-embedding index and upserted only the 15 fictional public offers. Existing account indexes were untouched. The seed tool's plain-text success acknowledgement was initially parsed as JSON; inspection confirmed the write had completed, and a regression test now covers that response without blindly retrying it.
+
+Implemented runtime search-only access, host scope, canonical hydration/hash validation, advisory ranking over exhaustive matching, and explicit semantic/local labels. Real paraphrase retrieval returned eligible Nina/Olivia and excluded insufficient-proficiency Zara. The full live Gemini/Mem0/Pinecone/custom-MCP workflow passed approval/save/restart recovery. Independent review found one Important concurrency issue in run labels; a failing interleaving test reproduced it, and per-call results fixed it. No Critical or deferred Minor findings.
+
+Final local checks: 70 backend tests, 10 browser cases, Ruff, production build, desktop/mobile inspection. Updated setup, architecture, validation, project summary, and the five-minute demo outline. The source remains local; no public repository, deployment, or video upload was created.

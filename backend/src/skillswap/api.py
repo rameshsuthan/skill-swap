@@ -39,12 +39,12 @@ class UnconfiguredModel:
         raise ValueError("google_api_key_required")
 
 
-def create_app(settings=None, model=None, memory=None):
+def create_app(settings=None, model=None, memory=None, semantic=None):
     settings = settings or Settings()
 
     @asynccontextmanager
     async def lifespan(app):
-        async with MCPRouter(settings, memory=memory) as router:
+        async with MCPRouter(settings, memory=memory, semantic=semantic) as router:
             chosen = model
             if chosen is None:
                 chosen = (
@@ -231,7 +231,7 @@ def create_app(settings=None, model=None, memory=None):
             },
             "skillswap": {"mode": "live", "tools": list(app.state.router.schemas)},
             "mem0": app.state.router.memory.provider(),
-            "pinecone": {"mode": "disabled", "detail": "Bonus deferred until live core passes"},
+            "pinecone": app.state.router.semantic.provider(),
         }
 
     if (ROOT / "frontend/dist").is_dir():

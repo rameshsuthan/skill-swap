@@ -26,6 +26,7 @@ class RunState(TypedDict, total=False):
     message: str
     decision: dict
     preferences: list[dict]
+    discovery: dict
 
 
 class RunService:
@@ -167,17 +168,35 @@ class RunService:
                     "remembered_preferences": preferences,
                 },
             )
+            semantic = results.get("search-records", self.router.semantic.provider())
+            discovery = {
+                "source": "semantic"
+                if semantic.get("mode") in {"live", "test"} and semantic.get("candidates")
+                else "local",
+                "detail": semantic["detail"],
+                "candidate_count": len(semantic.get("candidates", [])),
+            }
+            if semantic.get("mode") in {"live", "test"} and not semantic.get("candidates"):
+                discovery["detail"] = (
+                    "No eligible semantic suggestions; searched the complete local cohort."
+                )
             plans = results["find_exchange_cycles"]["plans"]
             if not plans:
                 return {
                     "status": "no_match",
                     "plan": None,
+                    "discovery": discovery,
                     "message": "; ".join(results["find_exchange_cycles"]["issues"]),
                 }
             plan = next((p for p in plans if p["fingerprint"] == out.fingerprint), None)
             if plan is None:
                 raise ValueError("unsupported_plan_selection")
-            return {"status": "running", "plan": plan, "message": out.summary}
+            return {
+                "status": "running",
+                "plan": plan,
+                "message": out.summary,
+                "discovery": discovery,
+            }
 
         async def review(state):
             ctx = ActorContext.model_validate(state["actor"])
@@ -381,6 +400,7 @@ class RunService:
             "question": values.get("question"),
             "result": values.get("result"),
             "message": values.get("message", ""),
+            "discovery": values.get("discovery"),
             "error": rec["error"],
             "model_calls": rec["model_calls"],
             "revisions": values.get("revisions", 0),

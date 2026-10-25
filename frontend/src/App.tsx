@@ -252,6 +252,19 @@ export default function App() {
           />
         </div>
         <ActivityDrawer events={events} busy={!!busy} />
+        {run?.discovery && (
+          <div className="discovery-note" role="status">
+            <Globe2 size={15} />
+            <span>
+              <strong>
+                {run.discovery.source === "semantic"
+                  ? "Semantic discovery + full cohort checks"
+                  : "Full cohort search"}
+              </strong>
+              <span>{run.discovery.detail}</span>
+            </span>
+          </div>
+        )}
         <MemoryPanel
           key={member}
           member={member}

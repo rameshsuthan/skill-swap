@@ -20,5 +20,9 @@ class Settings(BaseSettings):
     )
     mem0_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="MEM0_API_KEY")
     mem0_enabled: bool = Field(default=False, validation_alias="SKILLSWAP_MEM0_ENABLED")
+    pinecone_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="PINECONE_API_KEY")
+    pinecone_enabled: bool = Field(default=False, validation_alias="SKILLSWAP_PINECONE_ENABLED")
+    pinecone_index: str = Field(default="skillswap-demo", validation_alias="PINECONE_INDEX")
+    pinecone_namespace: str = Field(default="global-2026", validation_alias="PINECONE_NAMESPACE")
     cohort_id: str = "global-2026"
     demo_mode: bool = True

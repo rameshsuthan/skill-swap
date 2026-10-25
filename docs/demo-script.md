@@ -1,27 +1,27 @@
-# Five-minute demo script
+# Five-minute demo outline
 
-Use this as a recording outline after live Gemini generation recovers. A controlled-model rehearsal is clearly labeled test mode and is not proof of live Gemini.
+The core and both MCP bonuses have passed live verification. Use `gemini-3.5-flash-lite`; show actual provider/activity states. This is an outline for recording, not a claim that a video has been recorded or published. Leave at least 65 seconds between fresh live searches during rehearsal to reduce quota bursts.
 
-**0:00–0:30 — Problem.** “In a global learning community, the person who can teach me may want a different skill. SkillSwap finds a reciprocal exchange, including a circle of three.” Show Maya's Python offer and presentation-design request. State that profiles and dates are fictional.
+Before recording, reset fictional profiles with `scripts/seed_demo.py` if needed. It increments revision and preserves proposal history. Keep credentials and environment output off screen. Existing preferences can influence ordering; inspect them and explicitly edit/forget only the demo preferences you intend to change.
 
-**0:30–1:00 — Architecture.** React → FastAPI/LangGraph → real MCP subprocess → deterministic scheduling and SQLite. Three specialists interpret, coordinate, and review. One configured Gemini model, distinct prompts and tools. Only the trusted host can save.
+**0:00–0:25 — Problem and people.** “In a global learning community, the person who can teach me may want a different skill. SkillSwap finds reciprocal exchanges, including a circle of three.” Show Maya's Python offer and presentation-design goal. Disclose 15 fictional profiles and October 26–30, 2026 dates.
 
-**1:00–2:30 — Find and inspect.** Search as Maya. Expand actual activity. Show Maya → Leo, Leo → Nina, Nina → Maya. Read Chicago 13:00/London 18:00 for the first session and Bengaluru 19:30/Chicago 09:00 for the final one. Explain pairwise sessions do not need a shared three-person time.
+**0:25–0:55 — Architecture.** React → FastAPI/LangGraph → three specialist roles. Custom MCP owns profile/schedule validation and saving; Mem0 holds explicit preferences; Pinecone suggests relevant public offers. Only the host can save after approval.
 
-**2:30–3:30 — Changed availability.** While awaiting approval, run:
+**0:55–1:55 — Find and inspect.** Search as Maya. Show the three-cycle and each pair's two local times. Explain that the three people do not need one shared slot. Expand activity to show interpreter, coordinator, reviewer, and actual MCP calls. Semantic similarity helps ordering; it never proves feasibility.
+
+**1:55–2:55 — Changed availability.** While awaiting approval, run:
 
 ```bash
 .venv/bin/python scripts/demo_scenario.py remove-nina-window
 ```
 
-Approve the old view. The app must revise to October 28 and require a new approval. Do not describe the old approval as authorizing new times.
+Attempt the old approval. Show the revised October 28 session and the new approval requirement. The old approval cannot authorize different times.
 
-**3:30–4:30 — Human control and recovery.** Approve the new proposal. Point to “Awaiting participant confirmation.” Reload, export JSON, and show the saved local timezone snapshots. Stop/restart the backend at an approval interruption in a separate rehearsal to demonstrate durability.
+**2:55–3:40 — Human control and recovery.** Approve the new proposal, point to “Awaiting participant confirmation,” reload, and export JSON. Nothing is booked or sent. For a separate durability take, restart the backend at an approval interruption and show recovery.
 
-**4:30–5:00 — Boundaries.** Nothing is booked or sent. No real participant agreement. Mem0/Pinecone are disabled until separately verified. If Gemini returns 503 or quota errors, show the actual stopped state and explain the provider blocker; never splice a test fixture into a purported live run.
+**3:40–4:40 — Personalization and discovery.** Explicitly Remember a teaching-style preference, choose New search, and run a fresh search. Show `mem0 / search_memories`, `pinecone / search-records`, and the search-method label. Explain Edit/Forget and the visible full-cohort fallback if Pinecone fails. Allow the agents to finish; provider errors must remain visible rather than replaced with test footage.
 
-Before the next recording, reset the fictional profiles with `scripts/seed_demo.py`. Reset increments dataset revision and preserves saved proposal history. Keep API keys and terminal environment output out of the recording.
+**4:40–5:00 — Outcome and boundaries.** A reviewable, timezone-aware proposal backed by exact schedule checks, scoped memory/search, and durable recovery. All profiles are fictional; participants still need to agree. End on the polished workspace.
 
-## Optional Mem0 segment
-
-Enable the bonus in `.env` and restart. Run `scripts/demo_scenario.py memory-alternatives` before this segment. Request presentation design as Maya: the default direct exchange uses Olivia. In Learning preferences, explicitly Remember “I prefer guided-project teaching over discussion for my learning.” Start a fresh search and show Nina's declared guided-project offer supporting the three-member alternative. Show the actual `mem0 / search_memories` activity, then Edit or Forget the preference. Reset seed data afterward. Pause between live searches if Gemini reports a quota limit; never substitute a model automatically.
+For a separate comparison take, enable `scripts/demo_scenario.py memory-alternatives`: the default direct swap can use Olivia, while “I prefer guided-project teaching over discussion for my learning” supports Nina's declared style and the three-cycle. Space the two fresh searches by at least 65 seconds. This take can replace the availability segment to stay under five minutes. Reset the dataset afterward.

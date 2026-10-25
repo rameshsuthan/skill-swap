@@ -69,6 +69,8 @@ class ControlledModel:
         tool = self.tools[0]["function"]["name"]
         if tool == "get_learning_context":
             args = {}
+        elif tool == "search-records":
+            args = {"query_text": payload["request"]}
         elif tool == "search_memories":
             args = {"query": "teaching and learning preferences"}
         elif tool in ("search_teachers", "find_exchange_cycles"):
@@ -87,6 +89,12 @@ class ControlledModel:
                 teachers = next(r["teachers"] for r in results if "teachers" in r)
                 args["preferred_member_ids"] = [
                     t["id"] for t in teachers if style in t["offer"]["styles"]
+                ]
+                args["preferred_member_ids"] += [
+                    c["profile_id"]
+                    for r in results
+                    for c in r.get("candidates", [])
+                    if c["profile_id"] not in args["preferred_member_ids"]
                 ]
         else:
             args = {k: payload["plan"][k] for k in ("cycle", "goal")}

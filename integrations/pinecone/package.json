@@ -1,0 +1,7 @@
+{
+  "name": "skillswap-pinecone-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pinned official Pinecone MCP server used by the SkillSwap application",
+  "dependencies": { "@pinecone-database/mcp": "0.3.0" }
+}

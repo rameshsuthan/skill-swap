@@ -55,6 +55,11 @@ export type Run = {
   model_calls: number;
   revisions: number;
   active_seconds: number;
+  discovery?: {
+    source: "semantic" | "local";
+    detail: string;
+    candidate_count: number;
+  } | null;
 };
 export type Activity = {
   sequence: number;

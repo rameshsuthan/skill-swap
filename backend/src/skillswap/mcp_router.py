@@ -7,9 +7,10 @@ from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
 from .events import EventStore
-from .models import ActorContext
+from .models import ActorContext, MemberProfile
 from .settings import ROOT
 from .vendor_memory import MemoryService
+from .vendor_search import SemanticSearch
 
 ROLE_TOOLS = {
     "interpreter": {"get_learning_context"},
@@ -25,11 +26,12 @@ ROLE_TOOLS = {
 
 
 class MCPRouter:
-    def __init__(self, settings, memory=None):
+    def __init__(self, settings, memory=None, semantic=None):
         self.settings = settings
         self.events = EventStore(settings.checkpoint_db)
         self.schemas = {}
         self.memory = memory or MemoryService(settings)
+        self.semantic = semantic or SemanticSearch(settings)
         self.process_transport = StdioTransport(
             command=sys.executable,
             args=["-m", "skillswap.mcp_server"],
@@ -45,6 +47,7 @@ class MCPRouter:
         await self.client.__aenter__()
         self.schemas = {t.name: t for t in await self.client.list_tools()}
         await self.memory.open()
+        await self.semantic.open()
         return self
 
     async def close(self):
@@ -56,7 +59,24 @@ class MCPRouter:
     async def __aexit__(self, *args):
         await self.close()
 
-    async def call(self, server, tool, arguments, ctx: ActorContext, role="host"):
+    async def call(self, server, tool, arguments, ctx: ActorContext, role="host", *, goal=None):
+        if server == "pinecone":
+            if role != "coordinator" or tool not in self.semantic.TOOLS:
+                raise ValueError("tool_not_allowed")
+            if set(arguments) != {"query_text"} or not isinstance(arguments["query_text"], str):
+                raise ValueError("scope_override")
+            if goal is None:
+                raise ValueError("goal_required")
+            search = await self.semantic.search_result(ctx, arguments["query_text"])
+            # Hydration crosses the real custom MCP boundary, never reads SQLite directly.
+            raw = await self.call("skillswap", "get_learning_context", {}, ctx)
+            profiles = [MemberProfile.model_validate(p) for p in raw["profiles"]]
+            hydrated = self.semantic.hydrate(ctx, search.hits, profiles, goal)
+            return {
+                "candidates": [h.model_dump(exclude={"offer_hash"}) for h in hydrated],
+                "mode": search.mode,
+                "detail": search.detail,
+            }
         if server == "mem0":
             if role != "interpreter" or tool != "search_memories":
                 raise ValueError("tool_not_allowed")

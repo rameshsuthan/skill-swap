@@ -346,3 +346,57 @@ test("unknown_memory_outcome_can_be_acknowledged_without_retry", async ({
     ),
   ).toBeTruthy();
 });
+
+test("semantic_and_local_fallback_search_labels", async ({ page }) => {
+  let semantic = false;
+  await page.route(/\/api\/runs\/[^/]+$/, async (route) => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch();
+    const state = await response.json();
+    state.discovery = semantic
+      ? {
+          source: "semantic",
+          detail: "Semantic suggestions plus complete local cohort validation.",
+          candidate_count: 2,
+        }
+      : {
+          source: "local",
+          detail: "Pinecone unavailable; using complete local cohort search.",
+          candidate_count: 0,
+        };
+    await route.fulfill({ response, json: state });
+  });
+  await propose(page);
+  await expect(
+    page.getByText("Full cohort search", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Pinecone unavailable; using complete local cohort search.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Approve & save proposal" }),
+  ).toBeEnabled();
+  semantic = true;
+  await page.reload();
+  await expect(
+    page.getByText("Semantic discovery + full cohort checks", { exact: true }),
+  ).toBeVisible();
+  await page.getByText("Behind the exchange", { exact: true }).click();
+  await page.screenshot({
+    path: "test-results/semantic-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "test-results/semantic-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBeTruthy();
+});

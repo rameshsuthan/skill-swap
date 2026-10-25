@@ -27,3 +27,4 @@ def profiles(repo, actor):
 def disable_live_bonuses(monkeypatch):
     # Unit/integration checks never consume the developer's live vendor credentials.
     monkeypatch.setenv("SKILLSWAP_MEM0_ENABLED", "false")
+    monkeypatch.setenv("SKILLSWAP_PINECONE_ENABLED", "false")
