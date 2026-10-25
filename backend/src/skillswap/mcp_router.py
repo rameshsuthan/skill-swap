@@ -1,3 +1,4 @@
+import asyncio
 import json
 import sys
 import time
@@ -49,4 +50,4 @@ class MCPRouter:
             status='error'
             raise
         finally:
-            self.events.append(ctx.run_id,agent=role,server=server,tool=tool,status=status,duration_ms=(time.monotonic()-start)*1000)
+            await asyncio.to_thread(self.events.append,ctx.run_id,agent=role,server=server,tool=tool,status=status,duration_ms=(time.monotonic()-start)*1000)
