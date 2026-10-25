@@ -1,0 +1,26 @@
+flowchart TB
+  subgraph APP["Application backend"]
+    API["API + replayable activity + provider modes"] --> GRAPH["LangGraph / checkpoint owner"]
+    GRAPH --> I["Goal interpreter<br/>get_learning_context"]
+    GRAPH --> C["Matching coordinator<br/>search_teachers / find_exchange_cycles"]
+    GRAPH --> R["Feasibility reviewer<br/>get_learning_context / validate_and_schedule"]
+    GRAPH --> H["Trusted approval + commit<br/>save_proposal / get_proposal_status"]
+    I --> POLICY["fastmcp.Client + scoped wrappers<br/>allowlists • actor scope • timeouts"]
+    GRAPH --> MODEL["Gemini 3.8 Flash<br/>GEMINI_MODEL=gemini-3.8-flash"]
+    C --> POLICY
+    R --> POLICY
+    H --> POLICY
+    GRAPH --> CP[("checkpoints.sqlite<br/>staged plan • approvals • events")]
+  end
+  subgraph DOMAIN["Separate custom MCP stdio process"]
+    TOOLS["Six typed MCP tools"] --> SCOPE["Scope / revision / approval checks"]
+    SCOPE --> TIME["scheduling.py / zoneinfo<br/>dated local input + IANA zone + fold → UTC"]
+    TIME --> MATCH["matching.py<br/>compatibility • 2/3 cycles • UTC overlaps"]
+    MATCH --> SLOTS["30-minute pairwise sessions<br/>15-minute UTC start grid; no member overlap"]
+    SCOPE --> STORE["SQLite repository<br/>atomic save • idempotency"]
+    STORE --> DB[("skillswap.sqlite<br/>source local + UTC • zones • plan zone snapshots")]
+  end
+  POLICY -->|stdio| TOOLS
+  POLICY -.->|HTTPS MCP| M["Optional Mem0<br/>interpreter reads; user-triggered writes"]
+  POLICY -.->|stdio / Node| P["Optional official Pinecone MCP<br/>coordinator search-records"]
+  P -.-> FILTER["Hydrate/filter IDs via domain facts<br/>retain full local cycle search"]

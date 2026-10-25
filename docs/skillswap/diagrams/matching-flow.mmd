@@ -1,0 +1,28 @@
+flowchart TD
+  START["Select fictional learner + enter request"] --> CTX["Load profiles + required IANA zones + availability<br/>optional city/country are context only; memory optional"]
+  CTX --> INTERPRET["Interpreter maps request to supported goal"]
+  INTERPRET --> CLEAR{"Goal unambiguous?"}
+  CLEAR -->|No| QUESTION["Checkpoint + interrupt for clarification"]
+  QUESTION --> INTERPRET
+  CLEAR -->|Yes| FIND["Coordinator searches full active cohort<br/>optional Pinecone adjusts ordering only"]
+  FIND --> ENUM["Enumerate directed 2/3-member cycles<br/>distinct members; declared skill + minimum proficiency"]
+  ENUM --> NORMALIZE["scheduling.py / zoneinfo<br/>validate source-local dates + zone/fold; normalize UTC"]
+  NORMALIZE --> SCHEDULE["30-minute pairwise sessions; 15-minute UTC start grid<br/>matching.py checks UTC overlaps; no member overlap"]
+  SCHEDULE --> EXISTS{"Feasible plan?"}
+  EXISTS -->|No| BLOCK["Explain actual blocker; stop without invented match"]
+  EXISTS -->|Yes| REVIEW["Reviewer inspects evidence and calls validation"]
+  REVIEW --> VALID{"Current and valid?"}
+  VALID -->|No| LIMIT{"Within 2 revisions / 16 model calls / 90 active seconds?"}
+  LIMIT -->|Yes| FIND
+  LIMIT -->|No| STOP["Visible stopped state + blocker"]
+  VALID -->|Yes| APPROVE["Checkpoint plan + fingerprint; interrupt for proposer approval"]
+  APPROVE --> LOCAL["Review both local dates/times + zone IDs + dated offsets<br/>previous/next-day badges; worldwide remote exchange"]
+  LOCAL --> DECISION{"Human decision"}
+  DECISION -->|Cancel| CANCEL["Cancelled run"]
+  DECISION -->|Revise| NEW["New child run + explicit exclusions"]
+  NEW --> START
+  DECISION -->|Approve exact fingerprint| FRESH["Host revalidates exact sessions + current zone revision"]
+  FRESH --> CURRENT{"Unchanged?"}
+  CURRENT -->|No| LIMIT
+  CURRENT -->|Yes| SAVE["Host-only idempotent save via MCP"]
+  SAVE --> DONE["awaiting_participant_confirmation<br/>saved participant zone snapshots; no booking"]

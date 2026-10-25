@@ -1,0 +1,16 @@
+flowchart LR
+  UI["Worldwide remote workspace<br/>both local dates/times • zones/offsets • day badges"] -->|HTTP and event polling| API["FastAPI / LangGraph host"]
+  API --> ROLES["Three LLM roles<br/>interpret • coordinate • review"]
+  ROLES --> ROUTER["fastmcp.Client / scoped tool wrappers<br/>role allowlists + injected actor"]
+  API --> MODEL["Gemini 3.8 Flash<br/>GEMINI_MODEL=gemini-3.8-flash"]
+  API --> HOST["Trusted host nodes<br/>interrupt • approve • commit"]
+  HOST --> ROUTER
+  API --> CHECK[("Separate checkpoints.sqlite<br/>runs • interruptions • activity")]
+  ROUTER -->|stdio: real MCP calls| CUSTOM["Custom SkillSwap MCP server<br/>zoneinfo normalization • UTC matching"]
+  CUSTOM --> SQL[("skillswap.sqlite<br/>IANA zones • source-local + UTC windows • proposals")]
+  ROUTER -.->|Optional HTTPS MCP| MEM["Mem0 hosted MCP<br/>scoped preferences + explicit writes"]
+  ROUTER -.->|Optional stdio: official Node server| PINE["Pinecone MCP<br/>search-records only at runtime"]
+  PINE -.-> INDEX[("Project-specific integrated-embedding index<br/>public fictional offers only")]
+  SQL --> RESULT["Saved proposal + participant timezone snapshots<br/>awaiting_participant_confirmation"]
+  classDef bonus fill:#fff7ed,stroke:#c77721,stroke-dasharray:5 4;
+  class MEM,PINE,INDEX bonus;

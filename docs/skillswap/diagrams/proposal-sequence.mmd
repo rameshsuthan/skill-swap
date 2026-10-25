@@ -1,0 +1,45 @@
+sequenceDiagram
+  actor User as Demo proposer
+  participant UI as Workspace
+  participant Host as FastAPI / trusted graph host
+  participant GraphDB as Checkpoint SQLite
+  participant Reviewer as Reviewer LLM
+  participant MCP as Scoped backend MCP client
+  participant Domain as Custom stdio MCP server
+  participant DB as Domain SQLite
+  Reviewer->>MCP: validate_and_schedule(cycle, goal)
+  MCP->>Domain: Real MCP tool invocation + injected actor
+  Domain->>DB: Read profiles, IANA zones, source-local/UTC windows, revision
+  Note over Domain,DB: zoneinfo validates local input + fold; matching uses UTC
+  Domain-->>MCP: Fingerprinted valid plan
+  MCP-->>Reviewer: Adapted tool result
+  Host->>GraphDB: Persist staged plan; approval interrupt
+  Host-->>UI: Review plan + fingerprint + both local dates/times/zones/offsets
+  User->>UI: Approve exact plan
+  UI->>Host: Resume(run_id, approve, fingerprint)
+  Host->>Host: Serialize resume; verify waiting fingerprint
+  Host->>MCP: validate_and_schedule(exact approved sessions)
+  MCP->>Domain: Revalidate current facts
+  Domain-->>MCP: Current ValidationResult and fingerprinted plan
+  MCP-->>Host: Current validation result
+  Host->>Host: Compare staged revision and fingerprint with current result
+  alt Changed profile/zone revision or invalid sessions
+    Host-->>UI: Replan, display changes, require fresh approval
+  else Approved plan still current
+    Host->>MCP: save_proposal(plan, approval_fingerprint, run_id:fingerprint)
+    MCP->>Domain: Host-only write tool
+    Domain->>DB: Transaction: reject stale/invalid approval or save proposal + zone snapshots + unique key
+    alt Save response received
+      Domain-->>MCP: Proposal ID + awaiting_participant_confirmation
+      MCP-->>Host: Saved proposal
+    else Response lost or timed out
+      Host->>MCP: get_proposal_status(idempotency_key)
+      MCP->>Domain: Lookup scoped result
+      Domain-->>MCP: Existing proposal or explicit not_found
+      MCP-->>Host: Scoped lookup result
+      Note over Host,Domain: Retry exact idempotent save only after lookup, if needed
+    end
+    Host->>GraphDB: Persist saved result and activity
+    Host-->>UI: Saved proposal + JSON download
+    Note over User,UI: Other participants have not confirmed; availability is not reserved
+  end

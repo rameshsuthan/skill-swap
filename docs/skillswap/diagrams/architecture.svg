@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1330" viewBox="0 0 1600 1330" role="img" aria-labelledby="title desc">
+  <title id="title">SkillSwap system architecture</title>
+  <desc id="desc">A worldwide remote React workspace shows both participants' local dates and times, required IANA zones, date-specific offsets, and day badges. Location is optional context, never a distance filter or inferred timezone. Three Gemini 3.8 Flash roles and trusted host nodes use scoped fastmcp clients. The existing custom stdio MCP server normalizes source-local availability with zoneinfo and matches UTC windows. Domain SQLite retains source-local input, UTC windows, and saved participant timezone snapshots. Checkpoints remain separate. Optional Mem0 uses HTTPS MCP; optional official Pinecone Node MCP uses stdio. Saving creates an unconfirmed proposal, never a booking.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#49657b"/></marker>
+    <marker id="bonusArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#a56320"/></marker>
+    <style>
+      text{font-family:Arial,Helvetica,sans-serif;fill:#17334a}
+      .title{font-size:34px;font-weight:700}.subtitle{font-size:18px;fill:#52697c}
+      .label{font-size:21px;font-weight:700}.body{font-size:17px}.small{font-size:15px;fill:#52697c}.eyebrow{font-size:15px;font-weight:700;letter-spacing:1px}
+      .card{fill:#fff;stroke:#b5c8d7;stroke-width:2}.group{fill:#edf4fa;stroke:#a8c4da;stroke-width:2}
+      .bonus{fill:#fff8ed;stroke:#c38a48;stroke-width:2;stroke-dasharray:8 6}
+      .edge{fill:none;stroke:#49657b;stroke-width:2.5;marker-end:url(#arrow)}
+      .optional{fill:none;stroke:#a56320;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#bonusArrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="1330" fill="#f7f9fc"/>
+  <text x="60" y="62" class="title">SkillSwap · system architecture</text>
+  <text x="60" y="98" class="subtitle">Worldwide remote cohort · location is context; member IANA timezones are required</text>
+  <rect x="1245" y="43" width="18" height="18" rx="4" class="group"/><text x="1275" y="58" class="small">Core path</text>
+  <rect x="1245" y="77" width="18" height="18" rx="4" class="bonus"/><text x="1275" y="92" class="small">Optional vendor bonus</text>
+
+  <rect x="60" y="150" width="1480" height="100" rx="18" class="card"/>
+  <text x="88" y="188" class="label">React / TypeScript workspace</text>
+  <text x="88" y="221" class="body">Both local dates/times + zone IDs + dated offsets · previous/next-day badges · evidence + approval</text>
+  <path d="M800 250 V350" class="edge"/>
+  <text x="820" y="279" class="small">HTTP + replayable event polling</text>
+
+  <rect x="60" y="300" width="990" height="540" rx="22" class="group"/>
+  <text x="88" y="329" class="eyebrow">APPLICATION BACKEND · ONE WORKER</text>
+  <rect x="90" y="350" width="930" height="80" rx="14" class="card"/>
+  <text x="114" y="381" class="label">FastAPI + explicit LangGraph host</text>
+  <text x="114" y="409" class="body">Run state · clarification/approval interrupts · budgets · activity events</text>
+  <path d="M385 430 V480" class="edge"/><path d="M870 430 V480" class="edge"/>
+
+  <rect x="90" y="480" width="590" height="165" rx="15" class="card"/>
+  <text x="112" y="511" class="label">Three LLM specialists</text>
+  <rect x="110" y="532" width="170" height="90" rx="10" fill="#e9f3ff"/>
+  <text x="126" y="561" class="body">Goal interpreter</text><text x="126" y="590" class="small">Supported intent</text><text x="126" y="610" class="small">Clarify ambiguity</text>
+  <rect x="300" y="532" width="170" height="90" rx="10" fill="#e9f3ff"/>
+  <text x="316" y="561" class="body">Coordinator</text><text x="316" y="590" class="small">Investigate cycles</text><text x="316" y="610" class="small">Revise options</text>
+  <rect x="490" y="532" width="170" height="90" rx="10" fill="#e9f3ff"/>
+  <text x="506" y="561" class="body">Reviewer</text><text x="506" y="590" class="small">Inspect evidence</text><text x="506" y="610" class="small">Validate feasibility</text>
+
+  <rect x="720" y="480" width="300" height="165" rx="15" fill="#e9f8f0" stroke="#84b69d" stroke-width="2"/>
+  <text x="744" y="516" class="label">Trusted host nodes</text>
+  <text x="744" y="551" class="body">Bind exact approval</text><text x="744" y="579" class="body">Revalidate → save via MCP</text><text x="744" y="611" class="small">Write tools unavailable to LLMs</text>
+  <path d="M385 645 V705" class="edge"/><path d="M870 645 V705" class="edge"/>
+
+  <rect x="90" y="705" width="930" height="95" rx="14" class="card"/>
+  <text x="114" y="741" class="label">fastmcp.Client connections + scoped tool wrappers</text>
+  <text x="114" y="775" class="body">Discover tools · role allowlists · host-injected actor · timeouts · truthful provider modes</text>
+
+  <rect x="1110" y="350" width="430" height="130" rx="16" class="card"/>
+  <text x="1135" y="388" class="label">Gemini 3.8 Flash</text><text x="1135" y="421" class="body">GEMINI_MODEL=gemini-3.8-flash</text><text x="1135" y="453" class="small">Model/account availability must be verified</text>
+  <path d="M1020 390 H1110" class="edge"/>
+
+  <rect x="1110" y="640" width="430" height="160" rx="16" class="card"/>
+  <text x="1135" y="678" class="label">checkpoints.sqlite</text><text x="1135" y="711" class="body">Graph host owns this store</text><text x="1135" y="740" class="small">Staged plans · interrupts · run history</text><text x="1135" y="768" class="small">Approvals · replayable activity</text>
+  <path d="M1020 565 H1070 V695 H1110" class="edge"/>
+
+  <path d="M555 800 V880" class="edge"/>
+  <text x="575" y="861" class="small">stdio · actual custom MCP calls</text>
+  <rect x="60" y="880" width="990" height="150" rx="18" fill="#e9f8f0" stroke="#84b69d" stroke-width="2"/>
+  <text x="88" y="919" class="label">Custom SkillSwap MCP server · separate local process</text>
+  <text x="88" y="954" class="body">Six tools → zoneinfo normalization, UTC overlap checks, validation, atomic persistence</text>
+  <text x="88" y="990" class="small">Only runtime writer to domain storage · no hidden direct-Python bypass on MCP failure</text>
+  <rect x="1110" y="880" width="430" height="150" rx="16" class="card"/>
+  <text x="1135" y="918" class="label">skillswap.sqlite</text><text x="1135" y="951" class="body">Authoritative cohort facts</text><text x="1135" y="980" class="small">IANA zones · source-local + UTC windows</text><text x="1135" y="1008" class="small">Proposals retain participant zone snapshots</text>
+  <path d="M1050 955 H1110" class="edge"/>
+
+  <rect x="60" y="1100" width="1480" height="170" rx="20" class="bonus"/>
+  <text x="88" y="1129" class="eyebrow">OPTIONAL · TWO INDEPENDENT VENDOR MCP CONNECTIONS</text>
+  <rect x="90" y="1145" width="680" height="102" rx="12" fill="#fffdf9" stroke="#e1bd8e"/>
+  <text x="112" y="1176" class="label">Mem0 hosted MCP · HTTPS</text><text x="112" y="1205" class="body">Scoped preference retrieval; explicit Remember / Edit / Forget</text><text x="112" y="1230" class="small">Pending writes stay pending · never authoritative for scheduling</text>
+  <rect x="810" y="1145" width="700" height="102" rx="12" fill="#fffdf9" stroke="#e1bd8e"/>
+  <text x="832" y="1176" class="label">Official Pinecone MCP · Node stdio server</text><text x="832" y="1205" class="body">search-records → project index with integrated embeddings</text><text x="832" y="1230" class="small">Public fictional offers · hydrate/filter IDs · full local search remains</text>
+  <path d="M1020 752 H1070 V1075 H740 V1145" class="optional"/>
+  <path d="M1070 1075 H1160 V1145" class="optional"/>
+  <text x="60" y="1308" class="small">30-min pairwise sessions · 15-min UTC start grid · awaiting_participant_confirmation · no booking or implied consent</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1530" viewBox="0 0 1800 1530" role="img" aria-labelledby="title desc">
+  <title id="title">SkillSwap components and trust boundaries</title>
+  <desc id="desc">FastAPI hosts LangGraph, three LLM roles, trusted approval and commit, scoped fastmcp clients, and a separate checkpoint store. In the existing custom stdio MCP process, scheduling.py uses zoneinfo to validate dated local input, IANA zones and fold choices and normalize UTC; matching.py evaluates UTC overlaps and cycles. Thirty-minute sessions start on a 15-minute UTC grid. Domain SQLite retains source-local and UTC windows and plan timezone snapshots. Zone changes invalidate approval. Optional Mem0 and Pinecone remain separate scoped integrations. Only the host saves unconfirmed proposals.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#49657b"/></marker>
+    <marker id="bonusArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#a56320"/></marker>
+    <style>
+      text{font-family:Arial,Helvetica,sans-serif;fill:#17334a}.title{font-size:34px;font-weight:700}.subtitle{font-size:18px;fill:#52697c}.label{font-size:22px;font-weight:700}.body{font-size:18px}.small{font-size:16px;fill:#52697c}.code{font-family:Consolas,Menlo,monospace;font-size:16px}.eyebrow{font-size:15px;font-weight:700;letter-spacing:1px}
+      .card{fill:#fff;stroke:#b5c8d7;stroke-width:2}.group{fill:#edf4fa;stroke:#a8c4da;stroke-width:2}.domain{fill:#edf8f1;stroke:#84b69d;stroke-width:2}.bonus{fill:#fff8ed;stroke:#c38a48;stroke-width:2;stroke-dasharray:8 6}.edge{fill:none;stroke:#49657b;stroke-width:2.5;marker-end:url(#arrow)}.optional{fill:none;stroke:#a56320;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#bonusArrow)}
+    </style>
+  </defs>
+  <rect width="1800" height="1530" fill="#f7f9fc"/>
+  <text x="60" y="62" class="title">SkillSwap · components &amp; authority</text>
+  <text x="60" y="99" class="subtitle">Model reasoning investigates; ordinary code enforces eligibility, time, approval, and persistence</text>
+  <rect x="60" y="150" width="1680" height="80" rx="15" class="card"/>
+  <text x="86" y="184" class="label">FastAPI entrypoints / activity replay / provider status</text>
+  <text x="86" y="213" class="small">Selected demo actor is host-injected · resume is serialized per run · one backend worker</text>
+
+  <rect x="60" y="285" width="900" height="870" rx="22" class="group"/>
+  <text x="86" y="318" class="eyebrow">BACKEND HOST · EXPLICIT LANGGRAPH</text>
+  <path d="M510 230 V345" class="edge"/>
+  <rect x="90" y="345" width="840" height="100" rx="13" class="card"/>
+  <text x="114" y="380" class="label">Workflow + checkpoint owner</text>
+  <text x="114" y="412" class="body">Interpret → investigate → review → interrupt → revalidate → save</text>
+  <text x="114" y="433" class="small">At most 2 automatic revisions · 16 model calls · 90 active seconds</text>
+
+  <path d="M230 445 V490" class="edge"/><path d="M510 445 V490" class="edge"/><path d="M790 445 V490" class="edge"/>
+  <rect x="90" y="490" width="260" height="180" rx="13" class="card"/>
+  <text x="110" y="526" class="label">Goal interpreter</text><text x="110" y="561" class="body">Canonical goal / clarify</text><text x="110" y="596" class="code">get_learning_context</text><text x="110" y="631" class="small">Optional Mem0 reads</text><text x="110" y="653" class="small">Run-local goal override</text>
+  <rect x="380" y="490" width="260" height="180" rx="13" class="card"/>
+  <text x="400" y="526" class="label">Coordinator</text><text x="400" y="561" class="body">Select / revise candidates</text><text x="400" y="596" class="code">search_teachers</text><text x="400" y="621" class="code">find_exchange_cycles</text><text x="400" y="653" class="small">Optional Pinecone search</text>
+  <rect x="670" y="490" width="260" height="180" rx="13" class="card"/>
+  <text x="690" y="526" class="label">Reviewer</text><text x="690" y="561" class="body">Reject unsupported plan</text><text x="690" y="596" class="code">get_learning_context</text><text x="690" y="621" class="code">validate_and_schedule</text><text x="690" y="653" class="small">Inspect current evidence</text>
+
+  <rect x="90" y="720" width="510" height="155" rx="13" fill="#e3f4ea" stroke="#84b69d" stroke-width="2"/>
+  <text x="114" y="758" class="label">Trusted approval + commit</text><text x="114" y="790" class="body">Exact fingerprint; fresh approval after change</text><text x="114" y="824" class="code">save_proposal / get_proposal_status</text><text x="114" y="853" class="small">These tools are never exposed to LLM roles</text>
+  <rect x="640" y="720" width="290" height="155" rx="13" class="card"/>
+  <text x="661" y="758" class="label">checkpoints.sqlite</text><text x="661" y="790" class="small">Runs + staged plans</text><text x="661" y="816" class="small">Interrupts + approvals</text><text x="661" y="842" class="small">Events + bounded counters</text>
+  <path d="M930 395 H945 V700 H785 V720" class="edge"/>
+  <path d="M90 395 H75 V700 H345 V720" class="edge"/>
+
+  <rect x="90" y="945" width="840" height="160" rx="13" class="card"/>
+  <text x="114" y="982" class="label">Scoped MCP router + fastmcp.Client connections</text><text x="114" y="1018" class="body">Tool discovery / wrappers · actor injection · role allowlists</text><text x="114" y="1049" class="body">10-second call timeout · bounded retries · sanitized activity</text><text x="114" y="1080" class="small">Model: Gemini 3.8 Flash · GEMINI_MODEL=gemini-3.8-flash · no silent fallback</text>
+  <path d="M220 670 V690 H625 V910 H250 V945" class="edge"/>
+  <path d="M510 670 V680 H615 V900 H510 V945" class="edge"/>
+  <path d="M800 670 V690 H635 V920 H790 V945" class="edge"/>
+  <path d="M345 875 V945" class="edge"/>
+
+  <rect x="1040" y="285" width="700" height="870" rx="22" class="domain"/>
+  <text x="1068" y="318" class="eyebrow">CUSTOM MCP SERVER · SEPARATE STDIO PROCESS</text>
+  <rect x="1070" y="345" width="640" height="195" rx="13" class="card"/>
+  <text x="1094" y="381" class="label">Six typed MCP tool contracts</text>
+  <text x="1094" y="416" class="code">get_learning_context  ·  search_teachers</text>
+  <text x="1094" y="446" class="code">find_exchange_cycles  ·  validate_and_schedule</text>
+  <text x="1094" y="476" class="code">save_proposal  ·  get_proposal_status</text>
+  <text x="1094" y="512" class="small">Typed failures; injected cohort/member/run scope</text>
+  <path d="M930 1020 H995 V440 H1070" class="edge"/>
+  <text x="1070" y="1135" class="small">Actual MCP transport; no direct domain-function bypass.</text>
+
+  <path d="M1390 540 V590" class="edge"/>
+  <rect x="1070" y="590" width="640" height="120" rx="13" class="card"/>
+  <text x="1094" y="628" class="label">Deterministic trust boundary</text><text x="1094" y="663" class="body">Scope · revision · fingerprint · exact sessions + zones</text><text x="1094" y="692" class="small">Zone changes invalidate staged approval; save revalidates atomically</text>
+  <path d="M1220 710 V760" class="edge"/><path d="M1550 710 V760" class="edge"/>
+  <rect x="1070" y="760" width="300" height="175" rx="13" class="card"/>
+  <text x="1092" y="797" class="label">Matching + time</text><text x="1092" y="831" class="small">matching.py: cycles + UTC</text><text x="1092" y="860" class="small">scheduling.py: zoneinfo</text><text x="1092" y="889" class="small">Local + zone/fold → UTC</text><text x="1092" y="916" class="small">30-min sessions / 15-min starts</text>
+  <rect x="1400" y="760" width="310" height="175" rx="13" class="card"/>
+  <text x="1422" y="797" class="label">SQLite repository</text><text x="1422" y="831" class="body">Atomic proposal save</text><text x="1422" y="860" class="body">Unique idempotency key</text><text x="1422" y="889" class="body">Status lookup before retry</text><text x="1422" y="916" class="small">Only domain runtime writer</text>
+  <path d="M1555 935 V985" class="edge"/>
+  <rect x="1070" y="985" width="640" height="120" rx="13" class="card"/>
+  <text x="1094" y="1023" class="label">skillswap.sqlite · domain authority</text><text x="1094" y="1056" class="body">Profiles/zones · source-local + UTC windows · revision</text><text x="1094" y="1085" class="small">Plans retain timezone snapshots; unconfirmed proposals reserve nothing</text>
+
+  <rect x="60" y="1250" width="1680" height="210" rx="20" class="bonus"/>
+  <text x="88" y="1281" class="eyebrow">OPTIONAL VENDOR CONNECTIONS · EXPLICITLY DISABLED / LIVE / DEGRADED / ERROR</text>
+  <rect x="90" y="1300" width="790" height="130" rx="12" fill="#fffdf9" stroke="#e1bd8e"/>
+  <text x="114" y="1335" class="label">Mem0 HTTPS MCP · scoped personal preferences</text><text x="114" y="1367" class="body">Interpreter searches; user-triggered add / update / delete</text><text x="114" y="1397" class="small">Check async write status; no automatic write retries or bulk deletion</text><text x="114" y="1420" class="small">Identity: selected cohort + learner; memory never overrides current facts</text>
+  <rect x="920" y="1300" width="790" height="130" rx="12" fill="#fffdf9" stroke="#e1bd8e"/>
+  <text x="944" y="1335" class="label">Official Pinecone Node stdio MCP · search-records</text><text x="944" y="1367" class="body">Project index / namespace with integrated embeddings</text><text x="944" y="1397" class="small">Hydrate/filter IDs against SQLite; similarity only informs ordering</text><text x="944" y="1420" class="small">Full active cohort search remains; setup/upsert is not an agent tool</text>
+  <path d="M350 1105 V1190 H850 V1300" class="optional"/>
+  <path d="M700 1105 V1175 H1315 V1300" class="optional"/>
+  <text x="60" y="1500" class="small">Saved outcome: awaiting_participant_confirmation · proposer approval only · no emails, calendar holds, or inferred participant consent</text>
+</svg>

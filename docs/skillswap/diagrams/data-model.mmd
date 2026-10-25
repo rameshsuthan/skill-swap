@@ -1,0 +1,94 @@
+erDiagram
+  COHORT ||--o{ MEMBER_PROFILE : contains
+  COHORT ||--|| DATASET_REVISION : versions
+  MEMBER_PROFILE ||--|| TEACHING_OFFER : declares
+  MEMBER_PROFILE ||--|| LEARNING_GOAL : stores
+  MEMBER_PROFILE ||--o{ AVAILABILITY_WINDOW : supplies
+  PROPOSAL ||--|| EXCHANGE_PLAN : preserves
+  EXCHANGE_PLAN ||--|| EXCHANGE_CYCLE : contains
+  EXCHANGE_PLAN ||--|{ SESSION : schedules
+  MEMBER_PROFILE ||--o{ SESSION : teaches
+  MEMBER_PROFILE ||--o{ SESSION : learns
+  PROPOSAL ||--|| IDEMPOTENCY_RECORD : deduplicates
+  RUN_SNAPSHOT ||--o{ ACTIVITY_EVENT : records
+  RUN_SNAPSHOT ||--o| EXCHANGE_PLAN : stages_logically
+  RUN_SNAPSHOT o|--o{ RUN_SNAPSHOT : parent_of
+  MEMBER_PROFILE {
+    string id PK
+    string cohort_id FK
+    string display_name
+    string iana_timezone_required
+    string optional_city
+    string optional_country
+    boolean active
+    string source_record_id
+  }
+  TEACHING_OFFER {
+    string skill_id
+    int proficiency_1_to_3
+    string description
+    string styles
+  }
+  LEARNING_GOAL {
+    string skill_id
+    int minimum_teacher_proficiency
+  }
+  AVAILABILITY_WINDOW {
+    string source_local_start
+    string source_local_end
+    string source_iana_timezone
+    int optional_start_fold
+    int optional_end_fold
+    datetime start_utc
+    datetime end_utc_exclusive
+  }
+  DATASET_REVISION {
+    int monotonic_revision
+  }
+  EXCHANGE_CYCLE {
+    string ordered_distinct_member_ids
+    string directed_edges_and_evidence_ids
+  }
+  EXCHANGE_PLAN {
+    string cohort_id
+    string member_id
+    string goal_override
+    string participant_timezone_snapshots
+    int dataset_revision
+    string fingerprint
+    string evidence
+    string reviewer_summary
+  }
+  SESSION {
+    string teacher_id FK
+    string learner_id FK
+    string skill_id
+    datetime start_utc
+    datetime end_utc
+    string approved_participant_local_iso_views
+  }
+  PROPOSAL {
+    string id PK
+    string actor_context
+    string idempotency_key UK
+    string status_awaiting_participant_confirmation
+    datetime created_at
+  }
+  IDEMPOTENCY_RECORD {
+    string key PK
+    string proposal_id FK
+  }
+  RUN_SNAPSHOT {
+    string run_id PK
+    string parent_run_id
+    string status
+    string interpreted_goal_override
+    string staged_plan_and_approval
+    string result_error_provider_modes
+  }
+  ACTIVITY_EVENT {
+    int sequence_per_run
+    datetime timestamp
+    string agent_server_tool
+    string status_duration_summary
+  }
