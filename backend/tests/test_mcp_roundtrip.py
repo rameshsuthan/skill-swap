@@ -32,3 +32,22 @@ def test_no_secret_in_events(tmp_path):
     assert 'secret' not in data and 'hidden' not in data
     assert events.list_after('run',0)[0]['sequence']==1
     assert events.list_after('run',1)==[]
+
+@pytest.mark.asyncio
+async def test_real_mcp_validate_save_retry(tmp_path):
+    router=MCPRouter(Settings(domain_db=tmp_path/'domain.sqlite',checkpoint_db=tmp_path/'check.sqlite'))
+    ctx=ActorContext(member_id='maya',run_id='write-test')
+    async with router:
+        found=await router.call('skillswap','find_exchange_cycles',{'goal':{'skill_id':'presentation_design'}},ctx,role='coordinator')
+        plan=found['plans'][0]
+        verified=await router.call('skillswap','validate_and_schedule',{'cycle':plan['cycle'],'goal':plan['goal'],'proposed_sessions':plan['sessions']},ctx,role='reviewer')
+        assert verified['valid']
+        args={'plan':plan,'approval_fingerprint':plan['fingerprint'],'idempotency_key':ctx.run_id+':'+plan['fingerprint']}
+        first=await router.call('skillswap','save_proposal',args,ctx)
+        again=await router.call('skillswap','save_proposal',args,ctx)
+        assert first['proposal']['id']==again['proposal']['id']
+        assert first['proposal']['plan']['sessions']==plan['sessions']
+        status=await router.call('skillswap','get_proposal_status',{'proposal_id':first['proposal']['id']},ctx)
+        assert status['proposal']['status']=='awaiting_participant_confirmation'
+        with pytest.raises(ValueError,match='tool_not_allowed'):
+            await router.call('skillswap','save_proposal',args,ctx,role='coordinator')
