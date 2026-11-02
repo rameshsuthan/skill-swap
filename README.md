@@ -132,4 +132,12 @@ For a new account/project, the following explicit setup command creates the conf
 
 The activity drawer shows actual `pinecone / search-records` calls. A search-method label distinguishes semantic suggestions from full local search. If Pinecone is unavailable, matching continues with a labeled local fallback. Per-run status is captured independently so simultaneous successes and failures cannot exchange labels. Re-seed after changing public teaching offers; availability changes remain authoritative in SQLite and do not require re-embedding.
 
-With both bonuses enabled, a normal live search uses nine model calls. Gemini quota still applies; space repeated live searches rather than changing models. Production authentication, calendar bookings, public publishing, and recording/uploading the demo video remain outside this local prototype.
+With both bonuses enabled, a normal live search uses nine model calls. Gemini quota still applies; space repeated live searches rather than changing models. Production authentication, calendar bookings, public publishing, and video uploading remain outside this local prototype. A narrated local demo has been recorded; see `docs/demo-script.md`.
+
+## Submission documentation
+
+The [submission report](docs/submission/SkillSwap-project-documentation.md) covers
+the project overview, datasets, AI-coding prompts, iterations, learnings, and
+verified results. The [editable Word version](docs/submission/SkillSwap-project-documentation.docx)
+is formatted for import into Google Docs. Publication links and the course form
+remain to be completed; no submission has been sent.
