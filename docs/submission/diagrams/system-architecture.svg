@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="940" viewBox="0 0 1000 940" role="img"><title>Implemented SkillSwap system architecture</title><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#45636b"/></marker></defs><rect width="100%" height="100%" fill="white"/>
+<rect x="260" y="10" width="480" height="82" rx="10" fill="#edf5f2" stroke="#7b9696" stroke-width="1.5"/>
+<text x="500.0" y="41" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">React workspace</text>
+<text x="500.0" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Goals · both local times · explicit approval</text>
+<polyline points="500,92 500,145" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="650" y="121" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18333a">HTTP and activity polling</text>
+<rect x="235" y="145" width="530" height="88" rx="10" fill="#edf5f2" stroke="#7b9696" stroke-width="1.5"/>
+<text x="500.0" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">FastAPI and LangGraph host</text>
+<text x="500.0" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Interpreter → Coordinator → Reviewer</text>
+<rect x="15" y="145" width="190" height="88" rx="10" fill="#eef2fa" stroke="#7b9696" stroke-width="1.5"/>
+<text x="110.0" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Gemini API</text>
+<text x="110.0" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">3.5 Flash Lite</text>
+<polyline points="235,189 205,189" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="235" y="270" width="530" height="82" rx="10" fill="#edf5f2" stroke="#7b9696" stroke-width="1.5"/>
+<text x="500.0" y="301" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Trusted host and MCP router</text>
+<text x="500.0" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Role allowlists · injected scope · approval checks</text>
+<polyline points="500,233 500,270" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="790" y="270" width="195" height="110" rx="10" fill="#f3f3f3" stroke="#7b9696" stroke-width="1.5"/>
+<text x="887.5" y="301" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Checkpoint SQLite</text>
+<text x="887.5" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Runs · interrupts</text>
+<text x="887.5" y="357" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Activity · recovery</text>
+<polyline points="765,310 790,310" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="15" y="425" width="305" height="115" rx="10" fill="#edf5f2" stroke="#7b9696" stroke-width="1.5"/>
+<text x="167.5" y="456" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Custom SkillSwap MCP</text>
+<text x="167.5" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Separate Python stdio server</text>
+<text x="167.5" y="512" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Six typed domain tools</text>
+<rect x="347" y="425" width="305" height="115" rx="10" fill="#fff5e7" stroke="#7b9696" stroke-width="1.5"/>
+<text x="499.5" y="456" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Mem0 MCP</text>
+<text x="499.5" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Hosted HTTPS transport</text>
+<text x="499.5" y="512" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Scoped learner preferences</text>
+<rect x="680" y="425" width="305" height="115" rx="10" fill="#fff5e7" stroke="#7b9696" stroke-width="1.5"/>
+<text x="832.5" y="456" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Pinecone MCP</text>
+<text x="832.5" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Official Node stdio server</text>
+<text x="832.5" y="512" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Runtime search-records only</text>
+<polyline points="370,352 370,390 167,390 167,425" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="235" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18333a">stdio</text>
+<polyline points="500,352 500,425" fill="none" stroke="#45636b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="545" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18333a">HTTPS</text>
+<polyline points="630,352 630,390 832,390 832,425" fill="none" stroke="#45636b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="758" y="380" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="400" fill="#18333a">stdio</text>
+<rect x="15" y="590" width="305" height="110" rx="10" fill="#edf5f2" stroke="#7b9696" stroke-width="1.5"/>
+<text x="167.5" y="621" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Deterministic domain</text>
+<text x="167.5" y="650" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Eligibility · UTC scheduling</text>
+<text x="167.5" y="677" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Revision · fingerprint · save</text>
+<polyline points="167,540 167,590" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="15" y="750" width="305" height="110" rx="10" fill="#f3f3f3" stroke="#7b9696" stroke-width="1.5"/>
+<text x="167.5" y="781" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Domain SQLite</text>
+<text x="167.5" y="810" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Profiles · availability</text>
+<text x="167.5" y="837" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Proposals · idempotency</text>
+<polyline points="167,700 167,750" fill="none" stroke="#45636b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="680" y="590" width="305" height="110" rx="10" fill="#f3f3f3" stroke="#7b9696" stroke-width="1.5"/>
+<text x="832.5" y="621" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#18333a">Dedicated Pinecone index</text>
+<text x="832.5" y="650" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">15 fictional public offers</text>
+<text x="832.5" y="677" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">No availability or memories</text>
+<polyline points="832,540 832,590" fill="none" stroke="#45636b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="360" y="755" text-anchor="start" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#18333a">Authority rules</text>
+<text x="360" y="790" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Models read and validate; only the host saves.</text>
+<text x="360" y="817" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Memory changes need an explicit UI action.</text>
+<text x="360" y="844" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Semantic hits are checked against current profiles.</text>
+<text x="360" y="871" text-anchor="start" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Full local matching still runs.</text>
+<text x="500" y="910" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#18333a">Dashed paths are optional integrations, both verified in this prototype.</text>
+</svg>

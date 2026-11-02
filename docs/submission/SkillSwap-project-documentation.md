@@ -148,3 +148,34 @@ The course handout requests a Google Doc, a video of five minutes or less, and a
 The current video demonstrates the application but does not explicitly describe AI-assisted coding. When recording the personal narration, replace part of the introduction with: “I built SkillSwap with Codex from an existing design and implementation plan. I used it for the MCP server, LangGraph workflow, React interface, tests, and debugging. I verified the result with live provider calls and automated checks.” Keep the final edited recording under five minutes.
 
 For reviewer navigation, use `README.md` for setup, `docs/skillswap/architecture.md` for architecture, `docs/validation-results.md` for evidence, `docs/build-log.md` for iterations, and `docs/demo-script.md` for the recording walkthrough. Historical planning diagrams retain the originally requested Gemini model; the implemented runtime and this submission use the explicitly authorized Flash Lite model.
+
+
+<!-- pagebreak -->
+
+## System architecture diagram
+
+This diagram shows the implemented application and its service boundaries. The three specialist roles use Gemini `gemini-3.5-flash-lite`. The host applies scope and approval policy before real MCP calls cross process or network boundaries.
+
+![Figure 1 Implemented system architecture with authoritative domain storage and optional MCP services](diagrams/system-architecture.png)
+
+The custom server owns domain operations. Graph checkpoints are separate from profiles and proposals. Mem0 and Pinecone enrich the workflow without becoming authoritative sources for eligibility or availability.
+
+<!-- pagebreak -->
+
+## Agent workflow diagram
+
+The workflow combines model reasoning with deterministic validation. Clarification and human review are durable interruptions. Optional memory is retrieved after hard intent is resolved; semantic search does not limit the full local search.
+
+![Figure 2 Agent workflow with clarification and approval interruptions](diagrams/agent-workflow.png)
+
+Cancellation stops the run. A requested revision starts a child run with explicit exclusions. Review failures may trigger bounded replanning; exhausted limits or unavailable model calls produce a visible stopped state. Changed facts require a new review and approval, rather than reusing consent for different times.
+
+<!-- pagebreak -->
+
+## Approval and save sequence diagram
+
+This sequence expands the most important write boundary. Approval identifies the exact staged plan. The host and custom server validate it against current facts before an atomic, idempotent save.
+
+![Figure 3 Exact approval and durable proposal saving](diagrams/approval-sequence.png)
+
+The arrows summarize logical request and result paths; MCP responses return through the application client and host. If a response is lost, status lookup precedes retry. A successful save records an unconfirmed proposal and approved timezone snapshots; it does not book sessions or send invitations.
